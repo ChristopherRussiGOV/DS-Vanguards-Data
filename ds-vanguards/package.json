@@ -1,16 +1,13 @@
 {
   "name": "ds-vanguards-panel",
   "version": "1.0.0",
-  "description": "DS-Vanguards Admin Panel",
-  "main": "api/index.js",
-  "scripts": {
-    "dev": "node api/server.js",
-    "start": "node api/server.js"
+  "description": "DS-Vanguards Admin Panel - Projeto TDS 3 ano",
+  "engines": {
+    "node": "18.x"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.11.3",
-    "cookie": "^0.6.0"
+    "pg": "^8.11.3"
   }
 }

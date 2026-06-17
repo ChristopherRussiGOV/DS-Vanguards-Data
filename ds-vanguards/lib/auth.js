@@ -1,11 +1,15 @@
 const jwt = require('jsonwebtoken');
 
-const SECRET = process.env.JWT_SECRET || 'ds-vanguards-secret-2025';
+const SECRET = process.env.JWT_SECRET || 'ds-vanguards-dev-secret-2025';
 
 const ROLE_LEVELS = { membro: 1, staff: 2, moderador: 3, admin: 4 };
 
 function signToken(user) {
-  return jwt.sign({ id: user.id, username: user.username, role: user.role }, SECRET, { expiresIn: '8h' });
+  return jwt.sign(
+    { id: user.id, username: user.username, role: user.role },
+    SECRET,
+    { expiresIn: '8h' }
+  );
 }
 
 function verifyToken(token) {
@@ -16,16 +20,10 @@ function verifyToken(token) {
   }
 }
 
-function getTokenFromReq(req) {
-  const auth = req.headers['authorization'];
-  if (auth && auth.startsWith('Bearer ')) return auth.slice(7);
-  return null;
-}
-
 function requireAuth(req) {
-  const token = getTokenFromReq(req);
-  if (!token) return null;
-  return verifyToken(token);
+  const auth = req.headers['authorization'];
+  if (!auth || !auth.startsWith('Bearer ')) return null;
+  return verifyToken(auth.slice(7));
 }
 
 function requireRole(user, minRole) {

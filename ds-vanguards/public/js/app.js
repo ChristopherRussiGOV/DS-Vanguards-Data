@@ -23,9 +23,25 @@ async function api(path, method = 'GET', body = null) {
   };
   if (TOKEN) opts.headers['Authorization'] = 'Bearer ' + TOKEN;
   if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(API + path, opts);
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
+
+  let res;
+  try {
+    res = await fetch(API + path, opts);
+  } catch (netErr) {
+    throw new Error('Sem conexão com o servidor. Verifique se o site está hospedado corretamente no Vercel.');
+  }
+
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Resposta inválida do servidor (HTTP ${res.status}): ${text.slice(0, 100)}`);
+  }
+
+  if (!res.ok) {
+    throw new Error(data.error || `Erro HTTP ${res.status}`);
+  }
   return data;
 }
 

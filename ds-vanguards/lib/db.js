@@ -1,21 +1,37 @@
 const { Pool } = require('pg');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
+let pool;
+
+function getPool() {
+  if (!pool) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL não configurada. Adicione nas variáveis de ambiente do Vercel.');
+    }
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      max: 5,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000,
+    });
+  }
+  return pool;
+}
 
 async function query(text, params) {
-  const client = await pool.connect();
+  const client = await getPool().connect();
   try {
-    const result = await client.query(text, params);
-    return result;
+    return await client.query(text, params);
   } finally {
     client.release();
   }
 }
 
+let dbInitialized = false;
+
 async function initDB() {
+  if (dbInitialized) return;
+
   await query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
@@ -31,7 +47,7 @@ async function initDB() {
       id SERIAL PRIMARY KEY,
       owner_id INTEGER REFERENCES users(id),
       table_name VARCHAR(100) NOT NULL,
-      columns JSONB NOT NULL,
+      columns JSONB NOT NULL DEFAULT '[]',
       created_at TIMESTAMP DEFAULT NOW()
     )
   `);
@@ -40,13 +56,13 @@ async function initDB() {
     CREATE TABLE IF NOT EXISTS table_rows (
       id SERIAL PRIMARY KEY,
       table_id INTEGER REFERENCES user_tables(id) ON DELETE CASCADE,
-      data JSONB NOT NULL,
+      data JSONB NOT NULL DEFAULT '{}',
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
     )
   `);
 
-  // Create default admin if not exists
+  // Create default admin
   const bcrypt = require('bcryptjs');
   const existing = await query(`SELECT id FROM users WHERE username = 'admin'`);
   if (existing.rows.length === 0) {
@@ -55,8 +71,9 @@ async function initDB() {
       `INSERT INTO users (username, password, role) VALUES ($1, $2, $3)`,
       ['admin', hash, 'admin']
     );
-    console.log('✅ Admin padrão criado: admin / Admin@VGS2025');
   }
+
+  dbInitialized = true;
 }
 
 module.exports = { query, initDB };
