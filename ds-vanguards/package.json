@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "DS-Vanguards Admin Panel - Projeto TDS 3 ano",
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
