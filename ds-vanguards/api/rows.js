@@ -1,10 +1,10 @@
 const { query, initDB } = require('../lib/db');
 const { requireAuth, requireRole, cors, json } = require('../lib/auth');
+const { logAction } = require('../lib/logger');
 
 module.exports = async (req, res) => {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
-
   try { await initDB(); } catch (e) {
     return json(res, 500, { error: 'Erro ao conectar ao banco: ' + e.message });
   }
@@ -32,6 +32,7 @@ module.exports = async (req, res) => {
         'INSERT INTO table_rows (table_id, data) VALUES ($1, $2) RETURNING *',
         [table_id, JSON.stringify(data)]
       );
+      await logAction(caller, 'Inseriu linha', `Tabela ID: ${table_id}`);
       return json(res, 201, { row: result.rows[0] });
     } catch (e) { return json(res, 500, { error: e.message }); }
   }
@@ -45,6 +46,7 @@ module.exports = async (req, res) => {
         'UPDATE table_rows SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
         [JSON.stringify(data), id]
       );
+      await logAction(caller, 'Editou linha', `Linha ID: ${id}`);
       return json(res, 200, { row: result.rows[0] });
     } catch (e) { return json(res, 500, { error: e.message }); }
   }
@@ -55,6 +57,7 @@ module.exports = async (req, res) => {
     if (!id) return json(res, 400, { error: 'ID obrigatório' });
     try {
       await query('DELETE FROM table_rows WHERE id = $1', [id]);
+      await logAction(caller, 'Excluiu linha', `Linha ID: ${id}`);
       return json(res, 200, { message: 'Linha excluída' });
     } catch (e) { return json(res, 500, { error: e.message }); }
   }

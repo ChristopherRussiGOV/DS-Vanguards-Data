@@ -1,18 +1,17 @@
 {
   "version": 2,
   "functions": {
-    "api/*.js": {
-      "memory": 256,
-      "maxDuration": 10
-    }
+    "api/*.js": { "memory": 256, "maxDuration": 10 }
   },
   "rewrites": [
-    { "source": "/api/auth", "destination": "/api/auth" },
-    { "source": "/api/users", "destination": "/api/users" },
-    { "source": "/api/tables", "destination": "/api/tables" },
-    { "source": "/api/rows", "destination": "/api/rows" },
-    { "source": "/css/:path*", "destination": "/public/css/:path*" },
-    { "source": "/js/:path*", "destination": "/public/js/:path*" },
-    { "source": "/(.*)", "destination": "/public/index.html" }
+    { "source": "/api/auth",      "destination": "/api/auth" },
+    { "source": "/api/users",     "destination": "/api/users" },
+    { "source": "/api/tables",    "destination": "/api/tables" },
+    { "source": "/api/rows",      "destination": "/api/rows" },
+    { "source": "/api/databases", "destination": "/api/databases" },
+    { "source": "/api/logs",      "destination": "/api/logs" },
+    { "source": "/css/:path*",    "destination": "/public/css/:path*" },
+    { "source": "/js/:path*",     "destination": "/public/js/:path*" },
+    { "source": "/(.*)",          "destination": "/public/index.html" }
   ]
 }

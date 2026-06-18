@@ -43,9 +43,20 @@ async function initDB() {
   `);
 
   await query(`
+    CREATE TABLE IF NOT EXISTS databases (
+      id SERIAL PRIMARY KEY,
+      owner_id INTEGER REFERENCES users(id),
+      name VARCHAR(100) UNIQUE NOT NULL,
+      description TEXT DEFAULT '',
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  await query(`
     CREATE TABLE IF NOT EXISTS user_tables (
       id SERIAL PRIMARY KEY,
       owner_id INTEGER REFERENCES users(id),
+      database_id INTEGER REFERENCES databases(id) ON DELETE CASCADE,
       table_name VARCHAR(100) NOT NULL,
       columns JSONB NOT NULL DEFAULT '[]',
       created_at TIMESTAMP DEFAULT NOW()
@@ -62,7 +73,17 @@ async function initDB() {
     )
   `);
 
-  // Create default admin
+  await query(`
+    CREATE TABLE IF NOT EXISTS activity_logs (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER,
+      username VARCHAR(50),
+      action VARCHAR(200) NOT NULL,
+      details TEXT DEFAULT '',
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
   const bcrypt = require('bcryptjs');
   const existing = await query(`SELECT id FROM users WHERE username = 'admin'`);
   if (existing.rows.length === 0) {

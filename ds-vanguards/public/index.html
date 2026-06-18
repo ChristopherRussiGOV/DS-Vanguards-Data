@@ -4,11 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DS-Vanguards© | Painel</title>
+  <link rel="icon" type="image/png" href="dsvgicon2.png">
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
 
-<!-- ════════════ LOGIN PAGE ════════════ -->
+<!-- ══════════════ LOGIN PAGE ══════════════ -->
 <div id="login-page" class="active">
   <div class="login-bg"></div>
   <div class="login-card">
@@ -17,224 +18,253 @@
       <h1>DS-Vanguards©</h1>
       <p>Painel de Administração</p>
     </div>
-
     <div class="login-tabs">
       <div class="login-tab active" onclick="switchTab('tab-login')">Entrar</div>
       <div class="login-tab" onclick="switchTab('tab-register')">Criar Conta</div>
     </div>
-
-    <!-- Login Tab -->
     <div id="tab-login" class="tab-panel active">
       <div id="login-error" class="alert alert-error" style="display:none"></div>
       <div class="form-group">
         <label class="form-label">Usuário</label>
-        <input id="login-user" type="text" class="form-control" placeholder="seu_usuario" autocomplete="username" />
+        <input id="login-user" type="text" class="form-control" placeholder="seu_usuario" autocomplete="username"/>
       </div>
       <div class="form-group">
         <label class="form-label">Senha</label>
-        <input id="login-pass" type="password" class="form-control" placeholder="••••••••" autocomplete="current-password" />
+        <input id="login-pass" type="password" class="form-control" placeholder="••••••••" autocomplete="current-password"/>
       </div>
-      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="doLogin()" id="btn-login">
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doLogin()" id="btn-login">
         <span>⚡</span> Entrar no Painel
       </button>
       <div class="glow-line"></div>
-      <p style="font-size:11px; color:var(--text-muted); text-align:center;">
-        Em caso de erro contatar: <strong style="color:var(--blue-bright)">Vanguards Admin's</strong>
+      <p style="font-size:11px;color:var(--text-muted);text-align:center">
+        Admin padrão: <strong style="color:var(--blue-bright)">admin</strong> / <strong style="color:var(--blue-bright)">Admin@VGS2025</strong>
       </p>
     </div>
-
-    <!-- Register Tab -->
     <div id="tab-register" class="tab-panel">
       <div id="reg-error" class="alert alert-error" style="display:none"></div>
       <div id="reg-success" class="alert alert-success" style="display:none"></div>
       <div class="form-group">
         <label class="form-label">Usuário</label>
-        <input id="reg-user" type="text" class="form-control" placeholder="seu_usuario" autocomplete="username" />
+        <input id="reg-user" type="text" class="form-control" placeholder="seu_usuario"/>
       </div>
       <div class="form-group">
         <label class="form-label">Senha</label>
-        <input id="reg-pass" type="password" class="form-control" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+        <input id="reg-pass" type="password" class="form-control" placeholder="Mínimo 6 caracteres"/>
       </div>
       <div class="form-group">
         <label class="form-label">Confirmar Senha</label>
-        <input id="reg-pass2" type="password" class="form-control" placeholder="Confirme a senha" autocomplete="new-password" />
+        <input id="reg-pass2" type="password" class="form-control" placeholder="Confirme a senha"/>
       </div>
-      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="doRegister()" id="btn-register">
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doRegister()" id="btn-register">
         <span>🛡️</span> Criar Conta
       </button>
-      <p style="font-size:11px; color:var(--text-muted); text-align:center; margin-top:12px;">
+      <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:12px">
         Novas contas recebem cargo <strong style="color:var(--blue-bright)">Membro</strong>.
       </p>
     </div>
   </div>
 </div>
 
-<!-- ════════════ APP PAGE ════════════ -->
+<!-- ══════════════ APP PAGE ══════════════ -->
 <div id="app-page" style="display:none">
-  <div id="app">
+<div id="app">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-logo">
-        <div class="logo-icon">VGS</div>
-        <div class="logo-text">DS-Vanguards© <span>Admin Panel</span></div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">VGS</div>
+      <div class="logo-text">DS-Vanguards© <span>Admin Panel</span></div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebar-avatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="sidebar-username">—</div>
+        <span class="role-badge" id="sidebar-role-badge">—</span>
       </div>
-
-      <div class="sidebar-user" id="sidebar-user">
-        <div class="user-avatar" id="sidebar-avatar">?</div>
-        <div class="user-info">
-          <div class="user-name" id="sidebar-username">—</div>
-          <div><span class="role-badge" id="sidebar-role-badge">—</span></div>
-        </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
+      <div class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard">
+        <span class="nav-icon">📊</span> Dashboard
       </div>
-
-      <nav class="sidebar-nav">
-        <div class="nav-section-label">Principal</div>
-        <div class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard">
-          <span class="nav-icon">📊</span> Dashboard
-        </div>
-        <div class="nav-item" onclick="navigate('database')" id="nav-database">
-          <span class="nav-icon">🗄️</span> Banco de Dados
-        </div>
-
-        <div class="nav-section-label" id="nav-admin-label" style="display:none">Administração</div>
-        <div class="nav-item" onclick="navigate('users')" id="nav-users" style="display:none">
-          <span class="nav-icon">👥</span> Usuários
-        </div>
-      </nav>
-
-      <div class="sidebar-footer">
-        <button class="btn-logout" onclick="doLogout()">
-          <span>⛔</span> Sair do Painel
-        </button>
+      <div class="nav-item" onclick="navigate('sqleditor')" id="nav-sqleditor">
+        <span class="nav-icon">🗄️</span> SQL Editor
       </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-      <div class="topbar">
-        <div class="topbar-title" id="topbar-title">📊 Dashboard</div>
-        <div class="topbar-right">
-          <span id="topbar-date"></span>
-          <span style="color:var(--blue-border)">|</span>
-          <span id="topbar-user-role" class="role-badge">—</span>
-        </div>
+      <div class="nav-section-label" id="nav-mod-label" style="display:none">Moderação</div>
+      <div class="nav-item" onclick="navigate('users')" id="nav-users" style="display:none">
+        <span class="nav-icon">👥</span> Usuários
       </div>
+      <div class="nav-item" onclick="navigate('logs')" id="nav-logs" style="display:none">
+        <span class="nav-icon">📋</span> Logs
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="doLogout()"><span>⛔</span> Sair do Painel</button>
+    </div>
+  </aside>
 
-      <div class="page-content">
+  <!-- MAIN -->
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">📊 Dashboard</div>
+      <div class="topbar-right">
+        <span id="topbar-date"></span>
+        <span style="color:var(--blue-border)">|</span>
+        <span id="topbar-user-role" class="role-badge">—</span>
+      </div>
+    </div>
 
-        <!-- ── DASHBOARD ── -->
-        <div id="page-dashboard">
-          <div class="stats-grid" id="stats-grid">
-            <div class="stat-card">
-              <div class="stat-value" id="stat-users">—</div>
-              <div class="stat-label">Usuários</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value" id="stat-tables">—</div>
-              <div class="stat-label">Tabelas</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value" id="stat-rows">—</div>
-              <div class="stat-label">Registros</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value" id="stat-role-level">—</div>
-              <div class="stat-label">Seu Cargo</div>
-            </div>
+    <div class="page-content">
+
+      <!-- ── DASHBOARD ── -->
+      <div id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-value" id="stat-users">—</div><div class="stat-label">Usuários</div></div>
+          <div class="stat-card"><div class="stat-value" id="stat-dbs">—</div><div class="stat-label">Databases</div></div>
+          <div class="stat-card"><div class="stat-value" id="stat-tables">—</div><div class="stat-label">Tabelas</div></div>
+          <div class="stat-card"><div class="stat-value" id="stat-rows">—</div><div class="stat-label">Registros</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">⚡ Bem-vindo ao <span class="title-accent">DS-Vanguards© Panel</span></div></div>
+          <div style="color:var(--text-secondary);line-height:1.9">
+            <p>Projeto do curso <strong style="color:var(--text-primary)">Técnico em Desenvolvimento de Sistemas — 3º ano</strong>.</p>
+            <div class="glow-line"></div>
+            <p>🟦 <strong style="color:var(--blue-bright)">Membro</strong> — Visualizar o banco de dados (somente leitura)</p>
+            <p>🟩 <strong style="color:#7fff00">Staff</strong> — Criar databases/tabelas, inserir e editar dados</p>
+            <p>🟨 <strong style="color:var(--warning)">Moderador</strong> — Excluir tabelas/databases, ver usuários e logs + Staff</p>
+            <p>🟥 <strong style="color:#ff80b0">Admin</strong> — Acesso total: gerenciar usuários, cargos e tudo acima</p>
           </div>
+        </div>
+      </div>
 
+      <!-- ── SQL EDITOR ── -->
+      <div id="page-sqleditor" style="display:none">
+
+        <!-- Databases list view -->
+        <div id="view-databases">
           <div class="card">
             <div class="card-header">
-              <div class="card-title">⚡ Bem-vindo ao <span class="title-accent">DS-Vanguards© Panel</span></div>
+              <div class="card-title">🗄️ <span class="title-accent">Databases</span></div>
+              <button class="btn btn-primary btn-sm" id="btn-create-db" style="display:none" onclick="openModal('modal-create-db')">+ Novo Database</button>
             </div>
-            <div style="color:var(--text-secondary); line-height:1.8;">
-              <p>Este painel foi desenvolvido como projeto do curso <strong style="color:var(--text-primary)">Técnico em Desenvolvimento de Sistemas</strong> — 3º ano.</p>
-              <div class="glow-line"></div>
-              <p style="margin-bottom:8px;"><strong style="color:var(--blue-bright)">🟦 Membro</strong> — Visualizar o banco de dados (somente leitura)</p>
-              <p style="margin-bottom:8px;"><strong style="color:#7fff00">🟩 Staff</strong> — Editar o banco de dados: criar tabelas e inserir/editar dados</p>
-              <p style="margin-bottom:8px;"><strong style="color:var(--warning)">🟨 Moderador</strong> — Excluir tabelas, linhas + tudo do Staff</p>
-              <p><strong style="color:#ff80b0">🟥 Admin</strong> — Acesso total: gerenciar usuários, cargos e tudo acima</p>
-            </div>
+            <div id="databases-container"><div class="empty-state"><div class="spinner"></div></div></div>
           </div>
         </div>
 
-        <!-- ── DATABASE ── -->
-        <div id="page-database" style="display:none">
-
-          <!-- Table List -->
-          <div id="db-table-list">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">🗄️ <span class="title-accent">Tabelas</span></div>
-                <button class="btn btn-primary btn-sm" onclick="openCreateTableModal()" id="btn-create-table" style="display:none">
-                  + Nova Tabela
-                </button>
-              </div>
-              <div id="tables-container">
-                <div class="empty-state"><div class="spinner"></div></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Table Detail View -->
-          <div id="db-table-detail" style="display:none">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title" id="detail-title">📋 Tabela</div>
-                <div style="display:flex; gap:8px;">
-                  <button class="btn btn-secondary btn-sm" onclick="backToTableList()">← Voltar</button>
-                  <button class="btn btn-primary btn-sm" id="btn-add-row" style="display:none" onclick="openAddRowModal()">+ Linha</button>
-                  <button class="btn btn-danger btn-sm" id="btn-delete-table" style="display:none" onclick="confirmDeleteTable()">🗑 Deletar Tabela</button>
-                </div>
-              </div>
-              <div id="table-detail-content">
-                <div class="empty-state"><div class="spinner"></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── USERS ── -->
-        <div id="page-users" style="display:none">
+        <!-- Tables list inside a database -->
+        <div id="view-tables" style="display:none">
           <div class="card">
             <div class="card-header">
-              <div class="card-title">👥 <span class="title-accent">Gerenciar Usuários</span></div>
-              <span style="font-size:12px; color:var(--text-muted)">Somente Admin</span>
+              <div style="display:flex;align-items:center;gap:10px">
+                <button class="btn btn-secondary btn-sm" onclick="backToDatabases()">← Databases</button>
+                <div class="card-title">📁 <span class="title-accent" id="current-db-name">—</span></div>
+                <span id="current-db-desc" style="font-size:12px;color:var(--text-muted)"></span>
+              </div>
+              <button class="btn btn-primary btn-sm" id="btn-create-table" style="display:none" onclick="openCreateTableModal()">+ Nova Tabela</button>
             </div>
-            <div id="users-container">
-              <div class="empty-state"><div class="spinner"></div></div>
-            </div>
+            <div id="tables-container"><div class="empty-state"><div class="spinner"></div></div></div>
           </div>
         </div>
 
-      </div><!-- /page-content -->
-    </main>
+        <!-- Table detail (rows) -->
+        <div id="view-table-detail" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-secondary btn-sm" onclick="backToTables()">← Tabelas</button>
+                <div class="card-title">📋 <span class="title-accent" id="detail-title">—</span></div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn btn-secondary btn-sm" id="btn-edit-cols" style="display:none" onclick="openEditColsModal()">⚙️ Colunas</button>
+                <button class="btn btn-primary btn-sm" id="btn-add-row" style="display:none" onclick="openAddRowModal()">+ Linha</button>
+                <button class="btn btn-danger btn-sm" id="btn-delete-table" style="display:none" onclick="confirmDeleteTable()">🗑 Excluir Tabela</button>
+              </div>
+            </div>
+            <div id="table-detail-content"><div class="empty-state"><div class="spinner"></div></div></div>
+          </div>
+        </div>
 
-  </div><!-- /app -->
+      </div>
+
+      <!-- ── USERS ── -->
+      <div id="page-users" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">👥 <span class="title-accent">Usuários</span></div>
+            <span id="users-perms-label" style="font-size:12px;color:var(--text-muted)"></span>
+          </div>
+          <div id="users-container"><div class="empty-state"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+
+      <!-- ── LOGS ── -->
+      <div id="page-logs" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 <span class="title-accent">Logs de Atividade</span></div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span id="logs-live-dot" style="width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;box-shadow:0 0 6px var(--success)"></span>
+              <span style="font-size:11px;color:var(--text-muted)">Tempo real</span>
+              <button class="btn btn-secondary btn-sm" onclick="loadLogs()">↺ Atualizar</button>
+            </div>
+          </div>
+          <div id="logs-container"><div class="empty-state"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div>
 </div><!-- /app-page -->
 
-<!-- ════ MODAL: Create Table ════ -->
-<div class="modal-overlay" id="modal-create-table">
+<!-- ══ MODAL: Create Database ══ -->
+<div class="modal-overlay" id="modal-create-db">
   <div class="modal">
-    <div class="modal-title">🗄️ Criar Nova Tabela</div>
+    <div class="modal-title">🗄️ Novo Database</div>
     <div class="form-group">
-      <label class="form-label">Nome da Tabela</label>
-      <input id="new-table-name" type="text" class="form-control" placeholder="ex: Clientes, Produtos..." />
+      <label class="form-label">Nome do Database</label>
+      <input id="new-db-name" type="text" class="form-control" placeholder="ex: Clientes, Estoque, Escola..."/>
     </div>
     <div class="form-group">
-      <label class="form-label">Colunas</label>
-      <div style="display:flex; gap:8px; margin-bottom:8px;">
-        <input id="new-col-name" type="text" class="form-control" placeholder="Nome da coluna" />
-        <select id="new-col-type" class="form-control" style="width:130px; flex-shrink:0;">
-          <option value="texto">Texto</option>
-          <option value="número">Número</option>
-          <option value="data">Data</option>
-          <option value="sim/não">Sim/Não</option>
+      <label class="form-label">Descrição (opcional)</label>
+      <input id="new-db-desc" type="text" class="form-control" placeholder="Breve descrição do database"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-create-db')">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitCreateDB()">Criar Database</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Create Table ══ -->
+<div class="modal-overlay" id="modal-create-table">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-title">📋 Nova Tabela</div>
+    <div class="form-group">
+      <label class="form-label">Nome da Tabela</label>
+      <input id="new-table-name" type="text" class="form-control" placeholder="ex: Alunos, Produtos..."/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Adicionar Colunas</label>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <input id="new-col-name" type="text" class="form-control" placeholder="Nome da coluna" style="flex:1;min-width:120px"/>
+        <select id="new-col-type" class="form-control" style="width:140px;flex-shrink:0">
+          <option value="texto">📝 Texto</option>
+          <option value="número">🔢 Número</option>
+          <option value="decimal">💲 Decimal</option>
+          <option value="data">📅 Data</option>
+          <option value="data/hora">🕐 Data/Hora</option>
+          <option value="sim/não">✅ Sim/Não</option>
+          <option value="email">📧 Email</option>
+          <option value="url">🔗 URL</option>
+          <option value="telefone">📞 Telefone</option>
         </select>
-        <button class="btn btn-secondary btn-sm" onclick="addColumnToNew()">+</button>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary);cursor:pointer">
+          <input type="checkbox" id="new-col-required" style="accent-color:var(--blue-core)"/> Obrig.
+        </label>
+        <button class="btn btn-secondary btn-sm" onclick="addColumnToNew()">+ Add</button>
       </div>
-      <div id="new-cols-list" class="col-tags"></div>
+      <div id="new-cols-list" class="col-tags" style="min-height:32px;padding:4px;border:1px dashed var(--blue-dim);border-radius:4px"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-create-table')">Cancelar</button>
@@ -243,7 +273,40 @@
   </div>
 </div>
 
-<!-- ════ MODAL: Add Row ════ -->
+<!-- ══ MODAL: Edit Columns ══ -->
+<div class="modal-overlay" id="modal-edit-cols">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-title">⚙️ Editar Colunas</div>
+    <div id="edit-cols-list" style="margin-bottom:16px"></div>
+    <div style="border-top:1px solid var(--blue-dim);padding-top:14px">
+      <div class="form-label" style="margin-bottom:8px">Adicionar nova coluna</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input id="edit-new-col-name" type="text" class="form-control" placeholder="Nome da coluna" style="flex:1;min-width:120px"/>
+        <select id="edit-new-col-type" class="form-control" style="width:140px;flex-shrink:0">
+          <option value="texto">📝 Texto</option>
+          <option value="número">🔢 Número</option>
+          <option value="decimal">💲 Decimal</option>
+          <option value="data">📅 Data</option>
+          <option value="data/hora">🕐 Data/Hora</option>
+          <option value="sim/não">✅ Sim/Não</option>
+          <option value="email">📧 Email</option>
+          <option value="url">🔗 URL</option>
+          <option value="telefone">📞 Telefone</option>
+        </select>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary);cursor:pointer">
+          <input type="checkbox" id="edit-new-col-required" style="accent-color:var(--blue-core)"/> Obrig.
+        </label>
+        <button class="btn btn-secondary btn-sm" onclick="addColToEdit()">+ Add</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-edit-cols')">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitEditCols()">Salvar Colunas</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Add Row ══ -->
 <div class="modal-overlay" id="modal-add-row">
   <div class="modal">
     <div class="modal-title">➕ Adicionar Linha</div>
@@ -255,19 +318,30 @@
   </div>
 </div>
 
-<!-- ════ MODAL: Edit User ════ -->
+<!-- ══ MODAL: Edit Row ══ -->
+<div class="modal-overlay" id="modal-edit-row">
+  <div class="modal">
+    <div class="modal-title">✏️ Editar Linha</div>
+    <div id="edit-row-fields"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-edit-row')">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitEditRow()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Edit User ══ -->
 <div class="modal-overlay" id="modal-edit-user">
   <div class="modal">
     <div class="modal-title">✏️ Editar Usuário</div>
-    <input type="hidden" id="edit-user-id" />
-    <input type="hidden" id="edit-user-orig-name" />
+    <input type="hidden" id="edit-user-id"/>
     <div class="form-group">
-      <label class="form-label">Novo Usuário (opcional)</label>
-      <input id="edit-username" type="text" class="form-control" placeholder="Deixe vazio para manter" />
+      <label class="form-label">Novo Nome de Usuário (opcional)</label>
+      <input id="edit-username" type="text" class="form-control" placeholder="Deixe vazio para manter"/>
     </div>
     <div class="form-group">
       <label class="form-label">Nova Senha (opcional)</label>
-      <input id="edit-password" type="password" class="form-control" placeholder="Deixe vazio para manter" />
+      <input id="edit-password" type="password" class="form-control" placeholder="Deixe vazio para manter"/>
     </div>
     <div class="form-group">
       <label class="form-label">Cargo</label>
@@ -285,11 +359,11 @@
   </div>
 </div>
 
-<!-- ════ MODAL: Confirm ════ -->
+<!-- ══ MODAL: Confirm ══ -->
 <div class="modal-overlay" id="modal-confirm">
-  <div class="modal" style="max-width:380px;">
+  <div class="modal" style="max-width:380px">
     <div class="modal-title">⚠️ Confirmar</div>
-    <p id="confirm-msg" style="color:var(--text-secondary); margin-bottom:8px;"></p>
+    <p id="confirm-msg" style="color:var(--text-secondary);margin-bottom:8px"></p>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-confirm')">Cancelar</button>
       <button class="btn btn-danger" id="confirm-ok-btn">Confirmar</button>
@@ -297,21 +371,7 @@
   </div>
 </div>
 
-<!-- ════ MODAL: Edit Row ════ -->
-<div class="modal-overlay" id="modal-edit-row">
-  <div class="modal">
-    <div class="modal-title">✏️ Editar Linha</div>
-    <div id="edit-row-fields"></div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modal-edit-row')">Cancelar</button>
-      <button class="btn btn-primary" onclick="submitEditRow()">Salvar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ════ TOASTS ════ -->
 <div class="toast-container" id="toasts"></div>
-
 <script src="/js/app.js"></script>
 </body>
 </html>
