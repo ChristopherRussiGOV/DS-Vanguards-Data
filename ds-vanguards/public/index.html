@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DS-Vanguards© | Data-Panel</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DS-Vanguards© | Painel</title>
   <link rel="icon" type="image/png" href="dsvgicon2.png">
-  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/style.css"/>
 </head>
 <body>
 
-<!-- ══════════════ LOGIN PAGE ══════════════ -->
+<!-- ══════════════ LOGIN ══════════════ -->
 <div id="login-page" class="active">
   <div class="login-bg"></div>
   <div class="login-card">
@@ -24,53 +24,46 @@
     </div>
     <div id="tab-login" class="tab-panel active">
       <div id="login-error" class="alert alert-error" style="display:none"></div>
-      <div class="form-group">
-        <label class="form-label">Usuário</label>
-        <input id="login-user" type="text" class="form-control" placeholder="seu_usuario" autocomplete="username"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Senha</label>
-        <input id="login-pass" type="password" class="form-control" placeholder="••••••••" autocomplete="current-password"/>
-      </div>
+      <div class="form-group"><label class="form-label">Usuário</label>
+        <input id="login-user" type="text" class="form-control" placeholder="seu_usuario" autocomplete="username"/></div>
+      <div class="form-group"><label class="form-label">Senha</label>
+        <input id="login-pass" type="password" class="form-control" placeholder="••••••••" autocomplete="current-password"/></div>
       <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doLogin()" id="btn-login">
         <span>⚡</span> Entrar no Painel
       </button>
+      <div style="text-align:center;margin-top:12px">
+        <span onclick="openModal('modal-recovery')" style="font-size:12px;color:var(--blue-bright);cursor:pointer;text-decoration:underline">
+          🔑 Esqueci minha senha / Abrir chat de suporte
+        </span>
+      </div>
       <div class="glow-line"></div>
       <p style="font-size:11px;color:var(--text-muted);text-align:center">
-        Recuperar senha, contate: <strong style="color:var(--blue-bright)">Vanguards Admin's</strong>
+        Admin padrão: <strong style="color:var(--blue-bright)">admin</strong> / <strong style="color:var(--blue-bright)">Admin@VGS2025</strong>
       </p>
     </div>
     <div id="tab-register" class="tab-panel">
       <div id="reg-error" class="alert alert-error" style="display:none"></div>
       <div id="reg-success" class="alert alert-success" style="display:none"></div>
-      <div class="form-group">
-        <label class="form-label">Usuário</label>
-        <input id="reg-user" type="text" class="form-control" placeholder="seu_usuario"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Senha</label>
-        <input id="reg-pass" type="password" class="form-control" placeholder="Mínimo 6 caracteres"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Confirmar Senha</label>
-        <input id="reg-pass2" type="password" class="form-control" placeholder="Confirme a senha"/>
-      </div>
+      <div class="form-group"><label class="form-label">Usuário</label>
+        <input id="reg-user" type="text" class="form-control" placeholder="seu_usuario"/></div>
+      <div class="form-group"><label class="form-label">Senha</label>
+        <input id="reg-pass" type="password" class="form-control" placeholder="Mínimo 6 caracteres"/></div>
+      <div class="form-group"><label class="form-label">Confirmar Senha</label>
+        <input id="reg-pass2" type="password" class="form-control" placeholder="Confirme a senha"/></div>
       <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doRegister()" id="btn-register">
         <span>🛡️</span> Criar Conta
       </button>
       <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:12px">
-        Novas contas recebem acesso <strong style="color:var(--blue-bright)">Limitado</strong>.
+        Novas contas recebem cargo <strong style="color:var(--blue-bright)">Membro</strong>.
       </p>
     </div>
   </div>
 </div>
 
-<!-- ══════════════ APP PAGE ══════════════ -->
+<!-- ══════════════ APP ══════════════ -->
 <div id="app-page" style="display:none">
 <div id="app">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">VGS</div>
       <div class="logo-text">DS-Vanguards© <span>Admin Panel</span></div>
@@ -84,26 +77,21 @@
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section-label">Principal</div>
-      <div class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard">
-        <span class="nav-icon">📊</span> Dashboard
-      </div>
-      <div class="nav-item" onclick="navigate('sqleditor')" id="nav-sqleditor">
-        <span class="nav-icon">🗄️</span> SQL Editor
+      <div class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-item" onclick="navigate('sqleditor')" id="nav-sqleditor"><span class="nav-icon">🗄️</span> SQL Editor</div>
+      <div class="nav-item" onclick="navigate('chat')" id="nav-chat">
+        <span class="nav-icon">💬</span> Suporte
+        <span id="chat-badge" style="display:none;background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;margin-left:auto">!</span>
       </div>
       <div class="nav-section-label" id="nav-mod-label" style="display:none">Moderação</div>
-      <div class="nav-item" onclick="navigate('users')" id="nav-users" style="display:none">
-        <span class="nav-icon">👥</span> Usuários
-      </div>
-      <div class="nav-item" onclick="navigate('logs')" id="nav-logs" style="display:none">
-        <span class="nav-icon">📋</span> Logs
-      </div>
+      <div class="nav-item" id="nav-users" style="display:none" onclick="navigate('users')"><span class="nav-icon">👥</span> Usuários</div>
+      <div class="nav-item" id="nav-logs" style="display:none" onclick="navigate('logs')"><span class="nav-icon">📋</span> Logs</div>
     </nav>
     <div class="sidebar-footer">
       <button class="btn-logout" onclick="doLogout()"><span>⛔</span> Sair do Painel</button>
     </div>
   </aside>
 
-  <!-- MAIN -->
   <main class="main-content">
     <div class="topbar">
       <div class="topbar-title" id="topbar-title">📊 Dashboard</div>
@@ -113,10 +101,9 @@
         <span id="topbar-user-role" class="role-badge">—</span>
       </div>
     </div>
-
     <div class="page-content">
 
-      <!-- ── DASHBOARD ── -->
+      <!-- DASHBOARD -->
       <div id="page-dashboard">
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-value" id="stat-users">—</div><div class="stat-label">Usuários</div></div>
@@ -127,20 +114,19 @@
         <div class="card">
           <div class="card-header"><div class="card-title">⚡ Bem-vindo ao <span class="title-accent">DS-Vanguards© Panel</span></div></div>
           <div style="color:var(--text-secondary);line-height:1.9">
-            <p>Este site é um integração com: <strong style="color:var(--text-primary)">PostgreSQL Supabase.</strong>.</p>
+            <p>Projeto do curso <strong style="color:var(--text-primary)">Técnico em Desenvolvimento de Sistemas — 3º ano</strong>.</p>
             <div class="glow-line"></div>
             <p>🟦 <strong style="color:var(--blue-bright)">Membro</strong> — Visualizar o banco de dados (somente leitura)</p>
             <p>🟩 <strong style="color:#7fff00">Staff</strong> — Criar databases/tabelas, inserir e editar dados</p>
-            <p>🟨 <strong style="color:var(--warning)">Moderador</strong> — Excluir tabelas/databases, ver usuários e logs</p>
-            <p>🟥 <strong style="color:#ff80b0">Admin</strong> — Acesso total: gerenciar usuários e cargos</p>
+            <p>🟨 <strong style="color:var(--warning)">Moderador</strong> — Excluir tabelas/databases, ver usuários e logs + Staff</p>
+            <p>🟥 <strong style="color:#ff80b0">Admin</strong> — Acesso total: gerenciar usuários, cargos, chats e tudo acima</p>
           </div>
         </div>
       </div>
 
-      <!-- ── SQL EDITOR ── -->
+      <!-- SQL EDITOR -->
       <div id="page-sqleditor" style="display:none">
-
-        <!-- Databases list view -->
+        <!-- View: databases -->
         <div id="view-databases">
           <div class="card">
             <div class="card-header">
@@ -150,43 +136,44 @@
             <div id="databases-container"><div class="empty-state"><div class="spinner"></div></div></div>
           </div>
         </div>
-
-        <!-- Tables list inside a database -->
+        <!-- View: tables inside a database -->
         <div id="view-tables" style="display:none">
           <div class="card">
             <div class="card-header">
-              <div style="display:flex;align-items:center;gap:10px">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <button class="btn btn-secondary btn-sm" onclick="backToDatabases()">← Databases</button>
                 <div class="card-title">📁 <span class="title-accent" id="current-db-name">—</span></div>
                 <span id="current-db-desc" style="font-size:12px;color:var(--text-muted)"></span>
               </div>
-              <button class="btn btn-primary btn-sm" id="btn-create-table" style="display:none" onclick="openCreateTableModal()">+ Nova Tabela</button>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn btn-secondary btn-sm" id="btn-edit-db" style="display:none" onclick="openEditDBModal()">✏️ Database</button>
+                <button class="btn btn-primary btn-sm" id="btn-create-table" style="display:none" onclick="openCreateTableModal()">+ Nova Tabela</button>
+              </div>
             </div>
             <div id="tables-container"><div class="empty-state"><div class="spinner"></div></div></div>
           </div>
         </div>
-
-        <!-- Table detail (rows) -->
+        <!-- View: rows inside a table -->
         <div id="view-table-detail" style="display:none">
           <div class="card">
             <div class="card-header">
-              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <button class="btn btn-secondary btn-sm" onclick="backToTables()">← Tabelas</button>
                 <div class="card-title">📋 <span class="title-accent" id="detail-title">—</span></div>
               </div>
               <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn btn-secondary btn-sm" id="btn-rename-table" style="display:none" onclick="openRenameTableModal()">✏️ Tabela</button>
                 <button class="btn btn-secondary btn-sm" id="btn-edit-cols" style="display:none" onclick="openEditColsModal()">⚙️ Colunas</button>
                 <button class="btn btn-primary btn-sm" id="btn-add-row" style="display:none" onclick="openAddRowModal()">+ Linha</button>
-                <button class="btn btn-danger btn-sm" id="btn-delete-table" style="display:none" onclick="confirmDeleteTable()">🗑 Excluir Tabela</button>
+                <button class="btn btn-danger btn-sm" id="btn-delete-table" style="display:none" onclick="confirmDeleteTable()">🗑 Excluir</button>
               </div>
             </div>
             <div id="table-detail-content"><div class="empty-state"><div class="spinner"></div></div></div>
           </div>
         </div>
-
       </div>
 
-      <!-- ── USERS ── -->
+      <!-- USERS -->
       <div id="page-users" style="display:none">
         <div class="card">
           <div class="card-header">
@@ -197,41 +184,158 @@
         </div>
       </div>
 
-      <!-- ── LOGS ── -->
+      <!-- LOGS -->
       <div id="page-logs" style="display:none">
         <div class="card">
           <div class="card-header">
             <div class="card-title">📋 <span class="title-accent">Logs de Atividade</span></div>
             <div style="display:flex;align-items:center;gap:8px">
-              <span id="logs-live-dot" style="width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;box-shadow:0 0 6px var(--success)"></span>
-              <span style="font-size:11px;color:var(--text-muted)">Tempo real</span>
-              <button class="btn btn-secondary btn-sm" onclick="loadLogs()">↺ Atualizar</button>
+              <span style="width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;box-shadow:0 0 6px var(--success)"></span>
+              <span style="font-size:11px;color:var(--text-muted)">Tempo real (10s)</span>
+              <button class="btn btn-secondary btn-sm" onclick="loadLogs()">↺</button>
             </div>
           </div>
           <div id="logs-container"><div class="empty-state"><div class="spinner"></div></div></div>
         </div>
       </div>
 
-    </div><!-- /page-content -->
+      <!-- CHAT -->
+      <div id="page-chat" style="display:none">
+        <!-- Admin: list all chats -->
+        <div id="chat-admin-list" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">💬 <span class="title-accent">Chats de Suporte</span></div>
+              <button class="btn btn-secondary btn-sm" onclick="loadAdminChats()">↺ Atualizar</button>
+            </div>
+            <div id="admin-chats-container"><div class="empty-state"><div class="spinner"></div></div></div>
+          </div>
+        </div>
+        <!-- Admin: open chat detail -->
+        <div id="chat-admin-detail" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div style="display:flex;align-items:center;gap:8px">
+                <button class="btn btn-secondary btn-sm" onclick="backToAdminChats()">← Chats</button>
+                <div class="card-title">💬 <span class="title-accent" id="admin-chat-for">—</span></div>
+                <span id="admin-chat-status-badge" class="role-badge">—</span>
+              </div>
+              <button class="btn btn-danger btn-sm" id="btn-close-chat" onclick="closeSupportChat()">✖ Fechar Chat</button>
+            </div>
+            <div id="admin-chat-messages" class="chat-messages-box"></div>
+            <div class="chat-input-row" id="admin-chat-input-row">
+              <input id="admin-chat-input" type="text" class="form-control" placeholder="Responder como Admin..." onkeydown="if(event.key==='Enter')sendAdminMsg()"/>
+              <button class="btn btn-primary" onclick="sendAdminMsg()">Enviar</button>
+            </div>
+          </div>
+        </div>
+        <!-- User: own chat -->
+        <div id="chat-user-view" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">💬 <span class="title-accent">Meu Chat de Suporte</span></div>
+              <span id="user-chat-status-badge" class="role-badge">—</span>
+            </div>
+            <div id="user-chat-messages" class="chat-messages-box"></div>
+            <div class="chat-input-row" id="user-input-row">
+              <input id="user-chat-input" type="text" class="form-control" placeholder="Escreva sua mensagem..." onkeydown="if(event.key==='Enter')sendUserMsg()"/>
+              <button class="btn btn-primary" onclick="sendUserMsg()">Enviar</button>
+            </div>
+            <div id="user-chat-closed" class="alert alert-success" style="display:none;margin-top:8px">
+              ✅ Este chat foi encerrado pelo admin. Obrigado!
+            </div>
+          </div>
+        </div>
+        <!-- No chat -->
+        <div id="chat-none-view" style="display:none">
+          <div class="card">
+            <div class="card-header"><div class="card-title">💬 <span class="title-accent">Suporte</span></div></div>
+            <div class="empty-state">
+              <div class="empty-icon">💬</div>
+              <div class="empty-text" style="margin-bottom:16px">Você não tem nenhum chat aberto.</div>
+              <button class="btn btn-primary" onclick="createUserChat()">+ Abrir Chat com Admin</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </main>
 </div>
-</div><!-- /app-page -->
+</div>
+
+<!-- ══ MODAL: Recovery / Support Chat ══ -->
+<div class="modal-overlay" id="modal-recovery">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title">🔑 Suporte / Recuperar Senha</div>
+    <div id="recovery-step1">
+      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:14px">
+        Informe seu usuário para abrir um chat com o Admin, ou cole um token de chat já existente.
+      </p>
+      <div id="recovery-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-group"><label class="form-label">Seu Usuário</label>
+        <input id="recovery-username" type="text" class="form-control" placeholder="seu_usuario"/></div>
+      <div class="form-group"><label class="form-label">Token de chat existente (opcional)</label>
+        <input id="recovery-token" type="text" class="form-control" placeholder="Cole aqui se já tiver um token"/></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-recovery')">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitRecovery()">Abrir Chat →</button>
+      </div>
+    </div>
+    <div id="recovery-step2" style="display:none">
+      <div class="alert alert-success" style="margin-bottom:12px">✅ Chat criado com sucesso!</div>
+      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:8px">Seu token de acesso:</p>
+      <div id="recovery-token-box" style="background:var(--bg-secondary);border:1px solid var(--blue-border);border-radius:4px;padding:10px 14px;font-family:monospace;font-size:12px;color:var(--blue-glow);word-break:break-all;margin-bottom:10px"></div>
+      <p style="font-size:11px;color:var(--text-muted);margin-bottom:14px">⚠️ Guarde este token! Você precisará dele para retornar ao chat.</p>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="goToChatFromRecovery()">Ir para o Chat →</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ══ MODAL: Create Database ══ -->
 <div class="modal-overlay" id="modal-create-db">
   <div class="modal">
     <div class="modal-title">🗄️ Novo Database</div>
-    <div class="form-group">
-      <label class="form-label">Nome do Database</label>
-      <input id="new-db-name" type="text" class="form-control" placeholder="ex: Clientes, Estoque, Escola..."/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Descrição (opcional)</label>
-      <input id="new-db-desc" type="text" class="form-control" placeholder="Breve descrição do database"/>
-    </div>
+    <div class="form-group"><label class="form-label">Nome</label>
+      <input id="new-db-name" type="text" class="form-control" placeholder="ex: Clientes, Estoque..."/></div>
+    <div class="form-group"><label class="form-label">Descrição (opcional)</label>
+      <input id="new-db-desc" type="text" class="form-control" placeholder="Breve descrição"/></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-create-db')">Cancelar</button>
-      <button class="btn btn-primary" onclick="submitCreateDB()">Criar Database</button>
+      <button class="btn btn-primary" onclick="submitCreateDB()">Criar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Edit Database ══ -->
+<div class="modal-overlay" id="modal-edit-db">
+  <div class="modal">
+    <div class="modal-title">✏️ Editar Database</div>
+    <input type="hidden" id="edit-db-id"/>
+    <div class="form-group"><label class="form-label">Nome</label>
+      <input id="edit-db-name" type="text" class="form-control"/></div>
+    <div class="form-group"><label class="form-label">Descrição</label>
+      <input id="edit-db-desc" type="text" class="form-control"/></div>
+    <div class="form-group"><label class="form-label">Transferir para usuário (opcional)</label>
+      <input id="edit-db-owner" type="text" class="form-control" placeholder="Nome do novo dono (deixe vazio para manter)"/></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-edit-db')">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitEditDB()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Rename Table ══ -->
+<div class="modal-overlay" id="modal-rename-table">
+  <div class="modal">
+    <div class="modal-title">✏️ Renomear Tabela</div>
+    <div class="form-group"><label class="form-label">Novo Nome</label>
+      <input id="rename-table-name" type="text" class="form-control"/></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-rename-table')">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitRenameTable()">Salvar</button>
     </div>
   </div>
 </div>
@@ -240,31 +344,27 @@
 <div class="modal-overlay" id="modal-create-table">
   <div class="modal" style="max-width:560px">
     <div class="modal-title">📋 Nova Tabela</div>
+    <div class="form-group"><label class="form-label">Nome da Tabela</label>
+      <input id="new-table-name" type="text" class="form-control" placeholder="ex: Alunos, Produtos..."/></div>
     <div class="form-group">
-      <label class="form-label">Nome da Tabela</label>
-      <input id="new-table-name" type="text" class="form-control" placeholder="ex: Alunos, Produtos..."/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Adicionar Colunas</label>
+      <label class="form-label">Colunas</label>
       <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-        <input id="new-col-name" type="text" class="form-control" placeholder="Nome da coluna" style="flex:1;min-width:120px"/>
-        <select id="new-col-type" class="form-control" style="width:140px;flex-shrink:0">
-          <option value="texto">📝 Texto</option>
-          <option value="número">🔢 Número</option>
-          <option value="decimal">💲 Decimal</option>
-          <option value="data">📅 Data</option>
-          <option value="data/hora">🕐 Data/Hora</option>
-          <option value="sim/não">✅ Sim/Não</option>
-          <option value="email">📧 Email</option>
-          <option value="url">🔗 URL</option>
+        <input id="new-col-name" type="text" class="form-control" placeholder="Nome da coluna" style="flex:1;min-width:110px"/>
+        <select id="new-col-type" class="form-control" style="width:145px;flex-shrink:0">
+          <option value="texto">📝 Texto</option><option value="número">🔢 Número</option>
+          <option value="decimal">💲 Decimal</option><option value="data">📅 Data</option>
+          <option value="data/hora">🕐 Data/Hora</option><option value="sim/não">✅ Sim/Não</option>
+          <option value="email">📧 Email</option><option value="url">🔗 URL</option>
           <option value="telefone">📞 Telefone</option>
         </select>
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary);cursor:pointer">
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary);cursor:pointer;white-space:nowrap">
           <input type="checkbox" id="new-col-required" style="accent-color:var(--blue-core)"/> Obrig.
         </label>
         <button class="btn btn-secondary btn-sm" onclick="addColumnToNew()">+ Add</button>
       </div>
-      <div id="new-cols-list" class="col-tags" style="min-height:32px;padding:4px;border:1px dashed var(--blue-dim);border-radius:4px"></div>
+      <div id="new-cols-list" class="col-tags" style="min-height:32px;padding:4px;border:1px dashed var(--blue-dim);border-radius:4px">
+        <span style="color:var(--text-muted);font-size:12px;padding:4px">Nenhuma coluna ainda</span>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-create-table')">Cancelar</button>
@@ -281,19 +381,15 @@
     <div style="border-top:1px solid var(--blue-dim);padding-top:14px">
       <div class="form-label" style="margin-bottom:8px">Adicionar nova coluna</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <input id="edit-new-col-name" type="text" class="form-control" placeholder="Nome da coluna" style="flex:1;min-width:120px"/>
-        <select id="edit-new-col-type" class="form-control" style="width:140px;flex-shrink:0">
-          <option value="texto">📝 Texto</option>
-          <option value="número">🔢 Número</option>
-          <option value="decimal">💲 Decimal</option>
-          <option value="data">📅 Data</option>
-          <option value="data/hora">🕐 Data/Hora</option>
-          <option value="sim/não">✅ Sim/Não</option>
-          <option value="email">📧 Email</option>
-          <option value="url">🔗 URL</option>
+        <input id="edit-new-col-name" type="text" class="form-control" placeholder="Nome" style="flex:1;min-width:100px"/>
+        <select id="edit-new-col-type" class="form-control" style="width:145px;flex-shrink:0">
+          <option value="texto">📝 Texto</option><option value="número">🔢 Número</option>
+          <option value="decimal">💲 Decimal</option><option value="data">📅 Data</option>
+          <option value="data/hora">🕐 Data/Hora</option><option value="sim/não">✅ Sim/Não</option>
+          <option value="email">📧 Email</option><option value="url">🔗 URL</option>
           <option value="telefone">📞 Telefone</option>
         </select>
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary);cursor:pointer">
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary);cursor:pointer;white-space:nowrap">
           <input type="checkbox" id="edit-new-col-required" style="accent-color:var(--blue-core)"/> Obrig.
         </label>
         <button class="btn btn-secondary btn-sm" onclick="addColToEdit()">+ Add</button>
@@ -308,8 +404,7 @@
 
 <!-- ══ MODAL: Add Row ══ -->
 <div class="modal-overlay" id="modal-add-row">
-  <div class="modal">
-    <div class="modal-title">➕ Adicionar Linha</div>
+  <div class="modal"><div class="modal-title">➕ Adicionar Linha</div>
     <div id="add-row-fields"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-add-row')">Cancelar</button>
@@ -320,8 +415,7 @@
 
 <!-- ══ MODAL: Edit Row ══ -->
 <div class="modal-overlay" id="modal-edit-row">
-  <div class="modal">
-    <div class="modal-title">✏️ Editar Linha</div>
+  <div class="modal"><div class="modal-title">✏️ Editar Linha</div>
     <div id="edit-row-fields"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-edit-row')">Cancelar</button>
@@ -332,24 +426,16 @@
 
 <!-- ══ MODAL: Edit User ══ -->
 <div class="modal-overlay" id="modal-edit-user">
-  <div class="modal">
-    <div class="modal-title">✏️ Editar Usuário</div>
+  <div class="modal"><div class="modal-title">✏️ Editar Usuário</div>
     <input type="hidden" id="edit-user-id"/>
-    <div class="form-group">
-      <label class="form-label">Novo Nome de Usuário (opcional)</label>
-      <input id="edit-username" type="text" class="form-control" placeholder="Deixe vazio para manter"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Nova Senha (opcional)</label>
-      <input id="edit-password" type="password" class="form-control" placeholder="Deixe vazio para manter"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Cargo</label>
+    <div class="form-group"><label class="form-label">Novo Nome (opcional)</label>
+      <input id="edit-username" type="text" class="form-control" placeholder="Deixe vazio para manter"/></div>
+    <div class="form-group"><label class="form-label">Nova Senha (opcional)</label>
+      <input id="edit-password" type="password" class="form-control" placeholder="Deixe vazio para manter"/></div>
+    <div class="form-group"><label class="form-label">Cargo</label>
       <select id="edit-role" class="form-control">
-        <option value="membro">🟦 Membro</option>
-        <option value="staff">🟩 Staff</option>
-        <option value="moderador">🟨 Moderador</option>
-        <option value="admin">🟥 Admin</option>
+        <option value="membro">🟦 Membro</option><option value="staff">🟩 Staff</option>
+        <option value="moderador">🟨 Moderador</option><option value="admin">🟥 Admin</option>
       </select>
     </div>
     <div class="modal-footer">

@@ -13,7 +13,16 @@ module.exports = async (req, res) => {
   if (!caller) return json(res, 401, { error: 'Não autorizado' });
 
   if (req.method === 'GET') {
-    const { table_id } = req.query;
+    const { table_id, count_only } = req.query;
+
+    // count_only=1 → single query total across all tables
+    if (count_only) {
+      try {
+        const result = await query('SELECT COUNT(*) as total FROM table_rows');
+        return json(res, 200, { total: parseInt(result.rows[0].total) });
+      } catch (e) { return json(res, 500, { error: e.message }); }
+    }
+
     if (!table_id) return json(res, 400, { error: 'table_id obrigatório' });
     try {
       const tableResult = await query('SELECT * FROM user_tables WHERE id = $1', [table_id]);

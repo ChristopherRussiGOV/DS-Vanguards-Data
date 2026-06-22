@@ -14,9 +14,12 @@ module.exports = async (req, res) => {
 
   if (req.method === 'GET') {
     try {
-      const result = await query(
-        'SELECT d.*, u.username as owner_name, (SELECT COUNT(*) FROM user_tables WHERE database_id = d.id) as table_count FROM databases d JOIN users u ON d.owner_id = u.id ORDER BY d.created_at DESC'
-      );
+      const result = await query(`
+        SELECT d.*, u.username as owner_name,
+          (SELECT COUNT(*) FROM user_tables WHERE database_id = d.id) as table_count
+        FROM databases d JOIN users u ON d.owner_id = u.id
+        ORDER BY d.created_at DESC
+      `);
       return json(res, 200, { databases: result.rows });
     } catch (e) { return json(res, 500, { error: e.message }); }
   }
@@ -37,6 +40,28 @@ module.exports = async (req, res) => {
     } catch (e) { return json(res, 500, { error: e.message }); }
   }
 
+  // PUT - edit database (name, description, owner)
+  if (req.method === 'PUT') {
+    if (!requireRole(caller, 'staff')) return json(res, 403, { error: 'Sem permissão.' });
+    const { id, name, description, new_owner_username } = req.body || {};
+    if (!id) return json(res, 400, { error: 'ID obrigatório' });
+    try {
+      const updates = []; const vals = []; let i = 1;
+      if (name) { updates.push(`name = $${i++}`); vals.push(name); }
+      if (description !== undefined) { updates.push(`description = $${i++}`); vals.push(description); }
+      if (new_owner_username) {
+        const ownerRes = await query('SELECT id FROM users WHERE username = $1', [new_owner_username]);
+        if (!ownerRes.rows[0]) return json(res, 404, { error: `Usuário "${new_owner_username}" não encontrado` });
+        updates.push(`owner_id = $${i++}`); vals.push(ownerRes.rows[0].id);
+      }
+      if (!updates.length) return json(res, 400, { error: 'Nada para atualizar' });
+      vals.push(id);
+      const result = await query(`UPDATE databases SET ${updates.join(',')} WHERE id = $${i} RETURNING *`, vals);
+      await logAction(caller, 'Editou database', `ID: ${id}${name ? ' → ' + name : ''}${new_owner_username ? ', dono → ' + new_owner_username : ''}`);
+      return json(res, 200, { database: result.rows[0] });
+    } catch (e) { return json(res, 500, { error: e.message }); }
+  }
+
   if (req.method === 'DELETE') {
     if (!requireRole(caller, 'moderador')) return json(res, 403, { error: 'Sem permissão. Requer Moderador ou superior.' });
     const { id } = req.body || {};
@@ -44,7 +69,6 @@ module.exports = async (req, res) => {
     try {
       const db = await query('SELECT name FROM databases WHERE id = $1', [id]);
       if (!db.rows[0]) return json(res, 404, { error: 'Database não encontrado' });
-      // Delete all rows from tables in this database first
       await query('DELETE FROM table_rows WHERE table_id IN (SELECT id FROM user_tables WHERE database_id = $1)', [id]);
       await query('DELETE FROM user_tables WHERE database_id = $1', [id]);
       await query('DELETE FROM databases WHERE id = $1', [id]);

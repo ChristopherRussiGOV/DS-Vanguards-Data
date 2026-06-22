@@ -10,8 +10,8 @@ function getPool() {
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false },
-      max: 5,
-      idleTimeoutMillis: 30000,
+      max: 2,
+      idleTimeoutMillis: 10000,
       connectionTimeoutMillis: 5000,
     });
   }
@@ -38,9 +38,12 @@ async function initDB() {
       username VARCHAR(50) UNIQUE NOT NULL,
       password VARCHAR(255) NOT NULL,
       role VARCHAR(20) DEFAULT 'membro' CHECK (role IN ('membro','staff','moderador','admin')),
-      created_at TIMESTAMP DEFAULT NOW()
+      created_at TIMESTAMP DEFAULT NOW(),
+      last_seen TIMESTAMP DEFAULT NOW()
     )
   `);
+
+  await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen TIMESTAMP DEFAULT NOW()`);
 
   await query(`
     CREATE TABLE IF NOT EXISTS databases (
@@ -84,14 +87,35 @@ async function initDB() {
     )
   `);
 
+  await query(`
+    CREATE TABLE IF NOT EXISTS support_chats (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id),
+      username VARCHAR(50) NOT NULL,
+      token VARCHAR(64) UNIQUE NOT NULL,
+      subject VARCHAR(200) DEFAULT 'Recuperação de senha',
+      status VARCHAR(20) DEFAULT 'open',
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  await query(`
+    CREATE TABLE IF NOT EXISTS chat_messages (
+      id SERIAL PRIMARY KEY,
+      chat_id INTEGER REFERENCES support_chats(id) ON DELETE CASCADE,
+      sender_id INTEGER,
+      sender_name VARCHAR(50),
+      sender_role VARCHAR(20),
+      message TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
   const bcrypt = require('bcryptjs');
   const existing = await query(`SELECT id FROM users WHERE username = 'admin'`);
   if (existing.rows.length === 0) {
     const hash = await bcrypt.hash('Admin@VGS2025', 10);
-    await query(
-      `INSERT INTO users (username, password, role) VALUES ($1, $2, $3)`,
-      ['admin', hash, 'admin']
-    );
+    await query(`INSERT INTO users (username, password, role) VALUES ($1, $2, $3)`, ['admin', hash, 'admin']);
   }
 
   dbInitialized = true;

@@ -674,3 +674,87 @@ select.form-control option { background: var(--bg-card); }
   margin: 20px 0;
   opacity: 0.4;
 }
+
+/* ── Chat ── */
+.chat-messages-box {
+  min-height: 280px;
+  max-height: 420px;
+  overflow-y: auto;
+  background: var(--bg-secondary);
+  border: 1px solid var(--blue-dim);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 80%;
+}
+.chat-msg.from-me { align-self: flex-end; align-items: flex-end; }
+.chat-msg.from-other { align-self: flex-start; align-items: flex-start; }
+
+.chat-msg-header {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chat-bubble {
+  padding: 9px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+.from-me .chat-bubble {
+  background: var(--blue-core);
+  color: white;
+  border-bottom-right-radius: 3px;
+}
+.from-other .chat-bubble {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--blue-dim);
+  border-bottom-left-radius: 3px;
+}
+.from-other.is-admin .chat-bubble {
+  background: rgba(255,128,176,0.1);
+  border-color: rgba(255,128,176,0.3);
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+}
+.chat-input-row .form-control { flex: 1; }
+
+/* ── Online badge ── */
+.online-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.online-dot.online  { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.online-dot.offline { background: var(--text-muted); }
+
+.presence-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.presence-tag.online  { background: rgba(0,229,160,0.1); color: var(--success); border: 1px solid rgba(0,229,160,0.3); }
+.presence-tag.offline { background: var(--bg-secondary); color: var(--text-muted); border: 1px solid var(--blue-dim); }
+.presence-tag.me      { background: rgba(0,170,255,0.1); color: var(--blue-glow); border: 1px solid rgba(0,170,255,0.3); }
