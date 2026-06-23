@@ -31,14 +31,17 @@
       <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doLogin()" id="btn-login">
         <span>⚡</span> Entrar no Painel
       </button>
-      <div style="text-align:center;margin-top:12px">
-        <span onclick="openModal('modal-recovery')" style="font-size:12px;color:var(--blue-bright);cursor:pointer;text-decoration:underline">
-          🔑 Esqueci minha senha / Abrir chat de suporte
-        </span>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-secondary" style="flex:1;justify-content:center;font-size:12px" onclick="openModal('modal-ticket')">
+          🎫 Abrir Ticket
+        </button>
+        <button class="btn btn-secondary" style="flex:1;justify-content:center;font-size:12px" onclick="openModal('modal-token-chat')">
+          🔑 Acessar Chat
+        </button>
       </div>
       <div class="glow-line"></div>
       <p style="font-size:11px;color:var(--text-muted);text-align:center">
-        Recuperação de senha contate: <strong style="color:var(--blue-bright)">Admin Vanguards</strong>
+        Admin padrão: <strong style="color:var(--blue-bright)">admin</strong> / <strong style="color:var(--blue-bright)">Admin@VGS2025</strong>
       </p>
     </div>
     <div id="tab-register" class="tab-panel">
@@ -79,7 +82,7 @@
       <div class="nav-section-label">Principal</div>
       <div class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard"><span class="nav-icon">📊</span> Dashboard</div>
       <div class="nav-item" onclick="navigate('sqleditor')" id="nav-sqleditor"><span class="nav-icon">🗄️</span> SQL Editor</div>
-      <div class="nav-item" onclick="navigate('chat')" id="nav-chat">
+      <div class="nav-item" onclick="navigate('chat')" id="nav-chat" style="display:none">
         <span class="nav-icon">💬</span> Suporte
         <span id="chat-badge" style="display:none;background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;margin-left:auto">!</span>
       </div>
@@ -146,7 +149,7 @@
                 <span id="current-db-desc" style="font-size:12px;color:var(--text-muted)"></span>
               </div>
               <div style="display:flex;gap:6px;flex-wrap:wrap">
-                <button class="btn btn-secondary btn-sm" id="btn-edit-db" style="display:none" onclick="openEditDBModal()">✏️ Database</button>
+                <button class="btn btn-secondary btn-sm" id="btn-edit-db" style="display:none" onclick="openEditDBModal(CURRENT_DB.id, CURRENT_DB.name, CURRENT_DB.description)">✏️ Editar Database</button>
                 <button class="btn btn-primary btn-sm" id="btn-create-table" style="display:none" onclick="openCreateTableModal()">+ Nova Tabela</button>
               </div>
             </div>
@@ -264,32 +267,61 @@
 </div>
 </div>
 
-<!-- ══ MODAL: Recovery / Support Chat ══ -->
-<div class="modal-overlay" id="modal-recovery">
+<!-- ══ MODAL: Abrir Ticket ══ -->
+<div class="modal-overlay" id="modal-ticket">
   <div class="modal" style="max-width:420px">
-    <div class="modal-title">🔑 Suporte / Recuperar Senha</div>
-    <div id="recovery-step1">
+    <div class="modal-title">🎫 Abrir Ticket de Suporte</div>
+    <div id="ticket-step1">
       <p style="color:var(--text-secondary);font-size:13px;margin-bottom:14px">
-        Informe seu usuário para abrir um chat com o Admin, ou cole um token de chat já existente.
+        Crie um ticket para falar com o Admin. Guarde o token gerado para retornar ao chat.
       </p>
-      <div id="recovery-error" class="alert alert-error" style="display:none"></div>
-      <div class="form-group"><label class="form-label">Seu Usuário</label>
-        <input id="recovery-username" type="text" class="form-control" placeholder="seu_usuario"/></div>
-      <div class="form-group"><label class="form-label">Token de chat existente (opcional)</label>
-        <input id="recovery-token" type="text" class="form-control" placeholder="Cole aqui se já tiver um token"/></div>
+      <div id="ticket-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-group">
+        <label class="form-label">Seu Usuário (no sistema)</label>
+        <input id="ticket-username" type="text" class="form-control" placeholder="seu_usuario"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nome para exibição (opcional)</label>
+        <input id="ticket-display" type="text" class="form-control" placeholder="Como quer ser chamado"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Motivo</label>
+        <select id="ticket-subject" class="form-control">
+          <option value="Recuperacao de senha">🔑 Recuperar senha</option>
+          <option value="Problema com login">🚫 Problema com login</option>
+          <option value="Suporte geral">💬 Suporte geral</option>
+        </select>
+      </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal('modal-recovery')">Cancelar</button>
-        <button class="btn btn-primary" onclick="submitRecovery()">Abrir Chat →</button>
+        <button class="btn btn-secondary" onclick="closeModal('modal-ticket')">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitTicket()">Criar Ticket →</button>
       </div>
     </div>
-    <div id="recovery-step2" style="display:none">
-      <div class="alert alert-success" style="margin-bottom:12px">✅ Chat criado com sucesso!</div>
+    <div id="ticket-step2" style="display:none">
+      <div class="alert alert-success" style="margin-bottom:12px">✅ Ticket criado!</div>
       <p style="color:var(--text-secondary);font-size:13px;margin-bottom:8px">Seu token de acesso:</p>
-      <div id="recovery-token-box" style="background:var(--bg-secondary);border:1px solid var(--blue-border);border-radius:4px;padding:10px 14px;font-family:monospace;font-size:12px;color:var(--blue-glow);word-break:break-all;margin-bottom:10px"></div>
+      <div id="ticket-token-box" style="background:var(--bg-secondary);border:1px solid var(--blue-border);border-radius:4px;padding:10px 14px;font-family:monospace;font-size:12px;color:var(--blue-glow);word-break:break-all;margin-bottom:8px"></div>
+      <button class="btn btn-secondary btn-sm" onclick="copyTicketToken()" style="margin-bottom:14px">📋 Copiar Token</button>
       <p style="font-size:11px;color:var(--text-muted);margin-bottom:14px">⚠️ Guarde este token! Você precisará dele para retornar ao chat.</p>
       <div class="modal-footer">
-        <button class="btn btn-primary" onclick="goToChatFromRecovery()">Ir para o Chat →</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-ticket');resetTicketModal()">Fechar</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Entrar com Token ══ -->
+<div class="modal-overlay" id="modal-token-chat">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-title">🔑 Entrar no Chat com Token</div>
+    <div id="token-chat-error" class="alert alert-error" style="display:none"></div>
+    <div class="form-group">
+      <label class="form-label">Cole seu token aqui</label>
+      <input id="token-chat-input" type="text" class="form-control" placeholder="Token do seu ticket..."/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-token-chat')">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitTokenChat()">Entrar no Chat →</button>
     </div>
   </div>
 </div>

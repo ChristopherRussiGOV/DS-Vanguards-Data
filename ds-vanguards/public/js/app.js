@@ -135,6 +135,7 @@ function updateSidebar() {
     document.getElementById('nav-mod-label').style.display='';
     document.getElementById('nav-users').style.display='';
     document.getElementById('nav-logs').style.display='';
+    document.getElementById('nav-chat').style.display='';
   }
 }
 
@@ -671,7 +672,7 @@ async function loadChatPage() {
   ['chat-admin-list','chat-admin-detail','chat-user-view','chat-none-view'].forEach(function(id){
     document.getElementById(id).style.display='none';
   });
-  if (hasRole('admin')) {
+  if (hasRole('moderador')) {
     document.getElementById('chat-admin-list').style.display='';
     loadAdminChats();
   } else {
@@ -700,7 +701,10 @@ async function loadAdminChats() {
         '<td><span class="role-badge ' + (ch.status==='open'?'role-staff':'role-membro') + '">' + (ch.status==='open'?'Aberto':'Fechado') + '</span></td>' +
         '<td>' + (ch.msg_count||0) + '</td>' +
         '<td>' + new Date(ch.created_at).toLocaleDateString('pt-BR') + '</td>' +
-        '<td><button class="btn btn-primary btn-sm" onclick="openAdminChat(' + ch.id + ',\'' + esc(ch.username) + '\',\'' + ch.status + '\')">Abrir</button></td>' +
+        '<td class="actions">' +
+          '<button class="btn btn-primary btn-sm" onclick="openAdminChat(' + ch.id + ',\'' + esc(ch.username) + '\',\'' + ch.status + '\')">Abrir</button>' +
+          (hasRole('admin') ? ' <button class="btn btn-danger btn-sm" onclick="confirmDeleteChat(' + ch.id + ')">🗑 Deletar</button>' : '') +
+        '</td>' +
       '</tr>';
     });
     c.innerHTML = '<div class="data-table-wrap"><table class="data-table"><thead><tr><th>#</th><th>Usuario</th><th>Assunto</th><th>Status</th><th>Msgs</th><th>Data</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>';
@@ -820,36 +824,146 @@ function renderMessages(containerId, messages) {
   box.scrollTop = box.scrollHeight;
 }
 
-// PASSWORD RECOVERY
-async function submitRecovery() {
-  var username = document.getElementById('recovery-username').value.trim();
-  var token    = document.getElementById('recovery-token').value.trim();
-  var errEl    = document.getElementById('recovery-error');
+// TICKET (open support chat without login)
+var TICKET_TOKEN_SAVED = null;
+
+async function submitTicket() {
+  var username = document.getElementById('ticket-username').value.trim();
+  var subject  = document.getElementById('ticket-subject').value;
+  var errEl    = document.getElementById('ticket-error');
   errEl.style.display='none';
-  if (!username && !token) { errEl.style.display='flex'; errEl.textContent='Informe seu usuario ou token'; return; }
+  if (!username) { errEl.style.display='flex'; errEl.textContent='Informe seu usuario'; return; }
   try {
-    if (token) {
-      await api('/api/chat?action=join&token=' + encodeURIComponent(token));
-      closeModal('modal-recovery'); resetRecoveryModal(); navigate('chat');
-    } else {
-      var d = await api('/api/chat?action=create', 'POST', { username: username, subject: 'Recuperacao de senha' });
-      document.getElementById('recovery-step1').style.display='none';
-      document.getElementById('recovery-step2').style.display='';
-      document.getElementById('recovery-token-box').textContent = d.token;
-    }
+    var d = await api('/api/chat?action=create', 'POST', { username: username, subject: subject });
+    TICKET_TOKEN_SAVED = d.token;
+    document.getElementById('ticket-step1').style.display='none';
+    document.getElementById('ticket-step2').style.display='';
+    document.getElementById('ticket-token-box').textContent = d.token;
   } catch(e) { errEl.style.display='flex'; errEl.textContent=e.message; }
 }
 
-function goToChatFromRecovery() {
-  closeModal('modal-recovery'); resetRecoveryModal(); navigate('chat');
+function copyTicketToken() {
+  if (TICKET_TOKEN_SAVED) {
+    navigator.clipboard.writeText(TICKET_TOKEN_SAVED).then(function(){ toast('Token copiado!','success'); }).catch(function(){ toast('Copie manualmente','warning'); });
+  }
 }
 
-function resetRecoveryModal() {
-  document.getElementById('recovery-step1').style.display='';
-  document.getElementById('recovery-step2').style.display='none';
-  document.getElementById('recovery-username').value='';
-  document.getElementById('recovery-token').value='';
-  document.getElementById('recovery-error').style.display='none';
+function resetTicketModal() {
+  TICKET_TOKEN_SAVED = null;
+  document.getElementById('ticket-step1').style.display='';
+  document.getElementById('ticket-step2').style.display='none';
+  document.getElementById('ticket-username').value='';
+  document.getElementById('ticket-error').style.display='none';
+}
+
+// TOKEN CHAT (enter existing chat with token)
+var GUEST_CHAT = null;
+
+async function submitTokenChat() {
+  var token = document.getElementById('token-chat-input').value.trim();
+  var errEl = document.getElementById('token-chat-error');
+  errEl.style.display='none';
+  if (!token) { errEl.style.display='flex'; errEl.textContent='Cole o token'; return; }
+  try {
+    var d = await api('/api/chat?action=join&token=' + encodeURIComponent(token));
+    GUEST_CHAT = d.chat;
+    closeModal('modal-token-chat');
+    document.getElementById('token-chat-input').value='';
+    showGuestChat(d.chat, d.messages, token);
+  } catch(e) { errEl.style.display='flex'; errEl.textContent=e.message; }
+}
+
+function showGuestChat(chat, messages, token) {
+  // Show a floating guest chat overlay
+  var existing = document.getElementById('guest-chat-overlay');
+  if (existing) existing.remove();
+
+  var isClosed = chat.status === 'closed';
+  var overlay = document.createElement('div');
+  overlay.id = 'guest-chat-overlay';
+  overlay.style.cssText = 'position:fixed;bottom:20px;right:20px;width:360px;z-index:2000;';
+  overlay.innerHTML =
+    '<div class="card" style="box-shadow:var(--glow-md);border-color:var(--blue-glow)">' +
+      '<div class="card-header">' +
+        '<div class="card-title" style="font-size:14px">💬 Suporte — ' + esc(chat.username) + '</div>' +
+        '<div style="display:flex;gap:6px;align-items:center">' +
+          '<span class="role-badge ' + (isClosed?'role-membro':'role-staff') + '">' + (isClosed?'Encerrado':'Aberto') + '</span>' +
+          '<button onclick="document.getElementById('guest-chat-overlay').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">✕</button>' +
+        '</div>' +
+      '</div>' +
+      '<div id="guest-chat-messages" class="chat-messages-box" style="max-height:260px"></div>' +
+      (!isClosed ?
+        '<div class="chat-input-row">' +
+          '<input id="guest-chat-input" type="text" class="form-control" placeholder="Sua mensagem..." onkeydown="if(event.key==='Enter')sendGuestMsg()"/>' +
+          '<button class="btn btn-primary" onclick="sendGuestMsg()">Enviar</button>' +
+        '</div>' :
+        '<div class="alert alert-success" style="margin:8px">✅ Chat encerrado pelo admin.</div>'
+      ) +
+    '</div>';
+  document.body.appendChild(overlay);
+  renderGuestMessages(messages);
+
+  if (!isClosed) {
+    clearInterval(window._GUEST_INTERVAL);
+    window._GUEST_INTERVAL = setInterval(function() {
+      api('/api/chat?action=join&token=' + encodeURIComponent(token)).then(function(d2) {
+        renderGuestMessages(d2.messages);
+        if (d2.chat.status === 'closed') {
+          clearInterval(window._GUEST_INTERVAL);
+          var row = document.getElementById('guest-chat-overlay');
+          if (row) {
+            var inputRow = row.querySelector('.chat-input-row');
+            if (inputRow) inputRow.innerHTML = '<div class="alert alert-success" style="margin:8px">✅ Chat encerrado pelo admin.</div>';
+          }
+        }
+      }).catch(function(){});
+    }, 5000);
+  }
+}
+
+function renderGuestMessages(messages) {
+  var box = document.getElementById('guest-chat-messages');
+  if (!box) return;
+  if (!messages || !messages.length) {
+    box.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:16px;font-size:13px">Aguardando resposta do Admin...</div>';
+    return;
+  }
+  var html = '';
+  // We don't know who "we" are as guest, so treat admin messages as "other"
+  messages.forEach(function(m) {
+    var isAdm = m.sender_role === 'admin';
+    html += '<div class="chat-msg ' + (isAdm ? 'from-other is-admin' : 'from-me') + '">' +
+      '<div class="chat-msg-header">' +
+        (isAdm ? '<span class="role-badge role-admin" style="font-size:10px;padding:1px 5px">' + esc(m.sender_name) + '</span>' : '') +
+        '<span>' + new Date(m.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) + '</span>' +
+      '</div>' +
+      '<div class="chat-bubble">' + esc(m.message) + '</div>' +
+    '</div>';
+  });
+  box.innerHTML = html;
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendGuestMsg() {
+  if (!GUEST_CHAT) return;
+  var inp = document.getElementById('guest-chat-input');
+  var msg = inp ? inp.value.trim() : '';
+  if (!msg) return;
+  // Guest sends via token — need a lightweight endpoint
+  // Since guest has no auth, we use a separate token-based send
+  toast('Para enviar mensagens, faca login no painel primeiro.', 'info', 4000);
+}
+
+// DELETE CHAT (admin only)
+function confirmDeleteChat(chatId) {
+  document.getElementById('confirm-msg').textContent = 'Excluir este chat permanentemente?';
+  document.getElementById('confirm-ok-btn').onclick = async function() {
+    try {
+      await api('/api/chat?action=delete', 'POST', { chat_id: chatId });
+      closeModal('modal-confirm'); toast('Chat excluido','success'); loadAdminChats();
+    } catch(e) { toast(e.message,'error'); }
+  };
+  openModal('modal-confirm');
 }
 
 // BOOT
