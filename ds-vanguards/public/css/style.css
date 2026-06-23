@@ -568,13 +568,11 @@ select.form-control option { background: var(--bg-card); }
   background: var(--bg-primary);
   align-items: center;
   justify-content: center;
-  position: relative;
-  overflow: hidden;
 }
 #login-page.active { display: flex; }
 
 .login-bg {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background:
     radial-gradient(ellipse 600px 400px at 20% 60%, rgba(0,80,200,0.15) 0%, transparent 70%),
