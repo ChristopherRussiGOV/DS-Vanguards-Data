@@ -882,24 +882,30 @@ function showGuestChat(chat, messages, token) {
   var overlay = document.createElement('div');
   overlay.id = 'guest-chat-overlay';
   overlay.style.cssText = 'position:fixed;bottom:20px;right:20px;width:360px;z-index:2000;';
-  overlay.innerHTML =
-    '<div class="card" style="box-shadow:var(--glow-md);border-color:var(--blue-glow)">' +
-      '<div class="card-header">' +
-        '<div class="card-title" style="font-size:14px">💬 Suporte — ' + esc(chat.username) + '</div>' +
-        '<div style="display:flex;gap:6px;align-items:center">' +
-          '<span class="role-badge ' + (isClosed?'role-membro':'role-staff') + '">' + (isClosed?'Encerrado':'Aberto') + '</span>' +
-          '<button onclick="document.getElementById('guest-chat-overlay').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">✕</button>' +
-        '</div>' +
-      '</div>' +
-      '<div id="guest-chat-messages" class="chat-messages-box" style="max-height:260px"></div>' +
-      (!isClosed ?
-        '<div class="chat-input-row">' +
-          '<input id="guest-chat-input" type="text" class="form-control" placeholder="Sua mensagem..." onkeydown="if(event.key==='Enter')sendGuestMsg()"/>' +
-          '<button class="btn btn-primary" onclick="sendGuestMsg()">Enviar</button>' +
-        '</div>' :
-        '<div class="alert alert-success" style="margin:8px">✅ Chat encerrado pelo admin.</div>'
-      ) +
-    '</div>';
+  var closedHtml = '<div class="alert alert-success" style="margin:8px">Chat encerrado pelo admin.</div>';
+  var inputHtml = '<div class="chat-input-row"><input id="guest-chat-input" type="text" class="form-control" placeholder="Sua mensagem..." /><button class="btn btn-primary" onclick="sendGuestMsg()">Enviar</button></div>';
+  overlay.innerHTML = [
+    '<div class="card" style="box-shadow:var(--glow-md);border-color:var(--blue-glow)">',
+      '<div class="card-header">',
+        '<div class="card-title" style="font-size:14px">Suporte - ' + esc(chat.username) + '</div>',
+        '<div style="display:flex;gap:6px;align-items:center">',
+          '<span class="role-badge ' + (isClosed ? 'role-membro' : 'role-staff') + '">' + (isClosed ? 'Encerrado' : 'Aberto') + '</span>',
+          '<button id="guest-chat-close-btn" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">x</button>',
+        '</div>',
+      '</div>',
+      '<div id="guest-chat-messages" class="chat-messages-box" style="max-height:260px"></div>',
+      (!isClosed ? inputHtml : closedHtml),
+    '</div>'
+  ].join('');
+  document.getElementById('guest-chat-close-btn').addEventListener('click', function() {
+    var el = document.getElementById('guest-chat-overlay');
+    if (el) el.remove();
+    clearInterval(window._GUEST_INTERVAL);
+  });
+  var guestInput = document.getElementById('guest-chat-input');
+  if (guestInput) {
+    guestInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') sendGuestMsg(); });
+  }
   document.body.appendChild(overlay);
   renderGuestMessages(messages);
 
