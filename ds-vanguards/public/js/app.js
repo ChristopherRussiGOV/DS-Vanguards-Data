@@ -131,6 +131,9 @@ function updateSidebar() {
     el.textContent = labels[u.role] || u.role;
     el.className = 'role-badge role-' + u.role;
   });
+  if (hasRole('staff')) {
+    document.getElementById('nav-groupchat').style.display='';
+  }
   if (hasRole('moderador')) {
     document.getElementById('nav-mod-label').style.display='';
     document.getElementById('nav-users').style.display='';
@@ -151,22 +154,27 @@ function startHeartbeat() {
 }
 
 // NAVIGATION
+var GROUPCHAT_INTERVAL = null;
+
 function navigate(page) {
-  ['dashboard','sqleditor','users','logs','chat'].forEach(function(p) {
-    document.getElementById('page-'+p).style.display='none';
+  ['dashboard','sqleditor','users','logs','chat','groupchat'].forEach(function(p) {
+    var el = document.getElementById('page-'+p);
+    if (el) el.style.display='none';
   });
   document.querySelectorAll('.nav-item').forEach(function(el){ el.classList.remove('active'); });
-  document.getElementById('page-'+page).style.display='';
+  var pageEl = document.getElementById('page-'+page);
+  if (pageEl) pageEl.style.display='';
   var nv = document.getElementById('nav-'+page);
   if (nv) nv.classList.add('active');
-  var titles = { dashboard:'Dashboard', sqleditor:'SQL Editor', users:'Usuarios', logs:'Logs', chat:'Suporte' };
+  var titles = { dashboard:'Dashboard', sqleditor:'SQL Editor', users:'Usuarios', logs:'Logs', chat:'Suporte', groupchat:'Chat-VGS' };
   document.getElementById('topbar-title').textContent = titles[page] || page;
-  clearInterval(LOGS_INTERVAL); clearInterval(CHAT_INTERVAL);
-  if (page==='dashboard') loadDashboard();
-  if (page==='sqleditor') { showView('databases'); loadDatabases(); }
-  if (page==='users')     { loadPresence().then(function(){ loadUsers(); }); }
-  if (page==='logs')      { loadLogs(); LOGS_INTERVAL = setInterval(loadLogs, 10000); }
-  if (page==='chat')      { loadChatPage(); }
+  clearInterval(LOGS_INTERVAL); clearInterval(CHAT_INTERVAL); clearInterval(GROUPCHAT_INTERVAL);
+  if (page==='dashboard')  loadDashboard();
+  if (page==='sqleditor')  { showView('databases'); loadDatabases(); }
+  if (page==='users')      { loadPresence().then(function(){ loadUsers(); }); }
+  if (page==='logs')       { loadLogs(); LOGS_INTERVAL = setInterval(loadLogs, 10000); }
+  if (page==='chat')       { loadChatPage(); }
+  if (page==='groupchat')  { loadGroupChat(); GROUPCHAT_INTERVAL = setInterval(loadGroupChat, 5000); }
 }
 
 // DASHBOARD
@@ -897,16 +905,19 @@ function showGuestChat(chat, messages, token) {
       (!isClosed ? inputHtml : closedHtml),
     '</div>'
   ].join('');
-  document.getElementById('guest-chat-close-btn').addEventListener('click', function() {
-    var el = document.getElementById('guest-chat-overlay');
-    if (el) el.remove();
-    clearInterval(window._GUEST_INTERVAL);
-  });
+  document.body.appendChild(overlay);
+  var closeBtn = document.getElementById('guest-chat-close-btn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function() {
+      var el = document.getElementById('guest-chat-overlay');
+      if (el) el.remove();
+      clearInterval(window._GUEST_INTERVAL);
+    });
+  }
   var guestInput = document.getElementById('guest-chat-input');
   if (guestInput) {
     guestInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') sendGuestMsg(); });
   }
-  document.body.appendChild(overlay);
   renderGuestMessages(messages);
 
   if (!isClosed) {
@@ -970,6 +981,54 @@ function confirmDeleteChat(chatId) {
     } catch(e) { toast(e.message,'error'); }
   };
   openModal('modal-confirm');
+}
+
+// GROUP CHAT
+var LAST_GROUP_MSG_ID = 0;
+
+async function loadGroupChat() {
+  try {
+    var d = await api('/api/groupchat');
+    var messages = d.messages || [];
+    renderGroupMessages(messages);
+  } catch(e) {}
+}
+
+function renderGroupMessages(messages) {
+  var box = document.getElementById('groupchat-messages');
+  if (!box) return;
+  if (!messages.length) {
+    box.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px">Nenhuma mensagem ainda. Seja o primeiro!</div>';
+    return;
+  }
+  var labels = { membro:'Membro', staff:'Staff', moderador:'Moderador', admin:'Admin' };
+  var atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
+  var html = '';
+  messages.forEach(function(m) {
+    var fromMe = m.sender_id === CURRENT_USER.id;
+    html += '<div class="chat-msg ' + (fromMe ? 'from-me' : 'from-other') + '">' +
+      '<div class="chat-msg-header">' +
+        (!fromMe ? '<span class="role-badge role-' + m.sender_role + '" style="font-size:10px;padding:1px 5px">' + esc(m.sender_name) + '</span>' : '<span style="font-size:11px;color:var(--text-muted)">Voce</span>') +
+        '<span style="font-size:11px;color:var(--text-muted)">' + new Date(m.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) + '</span>' +
+      '</div>' +
+      '<div class="chat-bubble">' + esc(m.message) + '</div>' +
+    '</div>';
+  });
+  var isNew = messages[messages.length-1] && messages[messages.length-1].id > LAST_GROUP_MSG_ID;
+  LAST_GROUP_MSG_ID = messages[messages.length-1] ? messages[messages.length-1].id : LAST_GROUP_MSG_ID;
+  box.innerHTML = html;
+  if (atBottom || isNew) box.scrollTop = box.scrollHeight;
+}
+
+async function sendGroupMsg() {
+  var inp = document.getElementById('groupchat-input');
+  var msg = inp ? inp.value.trim() : '';
+  if (!msg) return;
+  inp.value = '';
+  try {
+    await api('/api/groupchat', 'POST', { message: msg });
+    await loadGroupChat();
+  } catch(e) { toast(e.message, 'error'); }
 }
 
 // BOOT

@@ -82,11 +82,13 @@
       <div class="nav-section-label">Principal</div>
       <div class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard"><span class="nav-icon">📊</span> Dashboard</div>
       <div class="nav-item" onclick="navigate('sqleditor')" id="nav-sqleditor"><span class="nav-icon">🗄️</span> SQL Editor</div>
-      <div class="nav-item" onclick="navigate('chat')" id="nav-chat" style="display:none">
-        <span class="nav-icon">💬</span> Suporte
-        <span id="chat-badge" style="display:none;background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;margin-left:auto">!</span>
+      <div class="nav-item" onclick="navigate('groupchat')" id="nav-groupchat" style="display:none">
+        <span class="nav-icon">⚔️</span> Chat-VGS
       </div>
       <div class="nav-section-label" id="nav-mod-label" style="display:none">Moderação</div>
+      <div class="nav-item" onclick="navigate('chat')" id="nav-chat" style="display:none">
+        <span class="nav-icon">💬</span> Suporte
+      </div>
       <div class="nav-item" id="nav-users" style="display:none" onclick="navigate('users')"><span class="nav-icon">👥</span> Usuários</div>
       <div class="nav-item" id="nav-logs" style="display:none" onclick="navigate('logs')"><span class="nav-icon">📋</span> Logs</div>
     </nav>
@@ -203,6 +205,21 @@
       </div>
 
       <!-- CHAT -->
+      <!-- GROUP CHAT -->
+      <div id="page-groupchat" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚔️ <span class="title-accent">Chat-VGS</span> <span style="font-size:11px;color:var(--text-muted)">Staff+</span></div>
+            <span id="groupchat-online-count" style="font-size:12px;color:var(--success)"></span>
+          </div>
+          <div id="groupchat-messages" class="chat-messages-box" style="max-height:460px"></div>
+          <div class="chat-input-row">
+            <input id="groupchat-input" type="text" class="form-control" placeholder="Mensagem para o grupo..." onkeydown="if(event.key==='Enter')sendGroupMsg()"/>
+            <button class="btn btn-primary" onclick="sendGroupMsg()">Enviar</button>
+          </div>
+        </div>
+      </div>
+
       <div id="page-chat" style="display:none">
         <!-- Admin: list all chats -->
         <div id="chat-admin-list" style="display:none">
