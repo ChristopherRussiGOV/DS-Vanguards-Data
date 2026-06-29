@@ -64,7 +64,7 @@ module.exports = async (req, res) => {
       if (cRes.rows[0].status === 'closed') return json(res, 400, { error: 'Chat encerrado' });
       await query(
         'INSERT INTO chat_messages (chat_id, sender_id, sender_name, sender_role, message) VALUES ($1,$2,$3,$4,$5)',
-        [cRes.rows[0].id, null, cRes.rows[0].username, 'membro', message]
+        [cRes.rows[0].id, null, 'Sem_login', 'guest', message]
       );
       return json(res, 201, { ok: true });
     } catch(e) { return json(res, 500, { error: e.message }); }
@@ -73,7 +73,7 @@ module.exports = async (req, res) => {
   // AUTH required below
   const caller = requireAuth(req);
   if (!caller) return json(res, 401, { error: 'Nao autorizado' });
-  if (!requireRole(caller, 'moderador')) return json(res, 403, { error: 'Sem permissao. Requer Moderador+.' });
+  // role checked per action below
 
   // GET list
   if (req.method === 'GET' && action === 'list') {

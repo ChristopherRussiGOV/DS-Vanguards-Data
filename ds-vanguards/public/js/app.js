@@ -136,9 +136,9 @@ function updateSidebar() {
   }
   if (hasRole('moderador')) {
     document.getElementById('nav-mod-label').style.display='';
+    document.getElementById('nav-chat').style.display='';
     document.getElementById('nav-users').style.display='';
     document.getElementById('nav-logs').style.display='';
-    document.getElementById('nav-chat').style.display='';
   }
 }
 
@@ -677,19 +677,18 @@ function confirmDeleteRow(rowId) {
 
 // CHAT
 async function loadChatPage() {
-  ['chat-admin-list','chat-admin-detail','chat-user-view','chat-none-view'].forEach(function(id){
-    document.getElementById(id).style.display='none';
+  ['chat-admin-list','chat-admin-detail','chat-user-view','chat-none-view','chat-no-access'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.style.display='none';
   });
+  if (!hasRole('moderador')) {
+    var na = document.getElementById('chat-no-access');
+    if (na) na.style.display='';
+    return;
+  }
   if (hasRole('moderador')) {
     document.getElementById('chat-admin-list').style.display='';
     loadAdminChats();
-  } else {
-    try {
-      var d = await api('/api/chat?action=messages&by_user=1');
-      showUserChat(d.chat, d.messages);
-    } catch(e) {
-      document.getElementById('chat-none-view').style.display='';
-    }
   }
 }
 
@@ -946,13 +945,24 @@ function renderGuestMessages(messages) {
     return;
   }
   var html = '';
-  // We don't know who "we" are as guest, so treat admin messages as "other"
   messages.forEach(function(m) {
-    var isAdm = m.sender_role === 'admin';
-    html += '<div class="chat-msg ' + (isAdm ? 'from-other is-admin' : 'from-me') + '">' +
+    var isAdm   = m.sender_role === 'admin' || m.sender_role === 'moderador';
+    var isGuest = m.sender_role === 'guest';
+    // Admin messages appear on RIGHT (from-me style) with pink badge
+    // User/guest messages appear on LEFT (from-other style) with name label
+    var cls = isAdm ? 'from-me' : 'from-other';
+    var nameHtml = '';
+    if (isAdm) {
+      nameHtml = '<span class="role-badge role-admin" style="font-size:10px;padding:1px 5px">' + esc(m.sender_name) + '</span>';
+    } else if (isGuest) {
+      nameHtml = '<span style="font-size:10px;color:#9b59b6;font-weight:700;background:rgba(155,89,182,0.15);padding:1px 6px;border-radius:3px;border:1px solid rgba(155,89,182,0.4)">Sem_login</span>';
+    } else {
+      nameHtml = '<span class="role-badge role-' + m.sender_role + '" style="font-size:10px;padding:1px 5px">' + esc(m.sender_name) + '</span>';
+    }
+    html += '<div class="chat-msg ' + cls + '">' +
       '<div class="chat-msg-header">' +
-        (isAdm ? '<span class="role-badge role-admin" style="font-size:10px;padding:1px 5px">' + esc(m.sender_name) + '</span>' : '') +
-        '<span>' + new Date(m.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) + '</span>' +
+        nameHtml +
+        '<span style="font-size:11px;color:var(--text-muted)">' + new Date(m.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) + '</span>' +
       '</div>' +
       '<div class="chat-bubble">' + esc(m.message) + '</div>' +
     '</div>';
@@ -966,9 +976,12 @@ async function sendGuestMsg() {
   var inp = document.getElementById('guest-chat-input');
   var msg = inp ? inp.value.trim() : '';
   if (!msg) return;
-  // Guest sends via token — need a lightweight endpoint
-  // Since guest has no auth, we use a separate token-based send
-  toast('Para enviar mensagens, faca login no painel primeiro.', 'info', 4000);
+  inp.value = '';
+  try {
+    await api('/api/chat?action=send_guest', 'POST', { token: GUEST_CHAT.token, message: msg });
+    var d = await api('/api/chat?action=join&token=' + encodeURIComponent(GUEST_CHAT.token));
+    renderGuestMessages(d.messages);
+  } catch(e) { toast(e.message, 'error'); }
 }
 
 // DELETE CHAT (admin only)

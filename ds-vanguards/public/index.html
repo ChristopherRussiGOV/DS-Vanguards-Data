@@ -41,7 +41,7 @@
       </div>
       <div class="glow-line"></div>
       <p style="font-size:11px;color:var(--text-muted);text-align:center">
-        Recuperar senha: <strong style="color:var(--blue-bright)">Contate um Admin VGS</strong> / <strong style="color:var(--blue-bright)">Abra um ticket.</strong>
+        Admin padrão: <strong style="color:var(--blue-bright)">admin</strong> / <strong style="color:var(--blue-bright)">Admin@VGS2025</strong>
       </p>
     </div>
     <div id="tab-register" class="tab-panel">
@@ -221,6 +221,17 @@
       </div>
 
       <div id="page-chat" style="display:none">
+        <!-- No access -->
+        <div id="chat-no-access" style="display:none">
+          <div class="card">
+            <div class="card-header"><div class="card-title">💬 <span class="title-accent">Suporte</span></div></div>
+            <div class="empty-state">
+              <div class="empty-icon">🔒</div>
+              <div class="empty-text" style="margin-bottom:8px">Sem acesso.</div>
+              <p style="font-size:12px;color:var(--text-muted)">Esta área é restrita a <strong style="color:var(--warning)">Moderador</strong> ou superior.</p>
+            </div>
+          </div>
+        </div>
         <!-- Admin: list all chats -->
         <div id="chat-admin-list" style="display:none">
           <div class="card">
