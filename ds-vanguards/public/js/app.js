@@ -1146,7 +1146,7 @@ async function sendGroupMsg() {
 
   // Handle slash commands
   if (msg.startsWith('/clear ') || msg === '/clear') {
-    if (!hasRole('moderador')) { toast('Apenas Moderador+ pode usar /clear', 'warning'); inp.value=''; return; }
+    if (!hasRole('admin')) { toast('Apenas Admins podem usar /clear', 'warning'); inp.value=''; return; }
     var arg = msg.replace('/clear', '').trim();
     if (!arg) { toast('Use: /clear all | /clear N | /clear DD/MM/AAAA', 'info'); return; }
     inp.value = '';
