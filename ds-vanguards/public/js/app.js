@@ -1015,12 +1015,20 @@ function confirmDeleteChat(chatId) {
 
 // GROUP CHAT
 var LAST_GROUP_MSG_ID = 0;
+var REPLY_TO = null; // { id, name, text }
+
+function today() {
+  var d = new Date();
+  var dd = String(d.getDate()).padStart(2,'0');
+  var mm = String(d.getMonth()+1).padStart(2,'0');
+  var yyyy = d.getFullYear();
+  return dd + '/' + mm + '/' + yyyy;
+}
 
 async function loadGroupChat() {
   try {
     var d = await api('/api/groupchat');
-    var messages = d.messages || [];
-    renderGroupMessages(messages);
+    renderGroupMessages(d.messages || []);
   } catch(e) {}
 }
 
@@ -1031,32 +1039,137 @@ function renderGroupMessages(messages) {
     box.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px">Nenhuma mensagem ainda. Seja o primeiro!</div>';
     return;
   }
-  var labels = { membro:'Membro', staff:'Staff', moderador:'Moderador', admin:'Admin' };
   var atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
   var html = '';
   messages.forEach(function(m) {
-    var fromMe = m.sender_id === CURRENT_USER.id;
-    html += '<div class="chat-msg ' + (fromMe ? 'from-me' : 'from-other') + '">' +
-      '<div class="chat-msg-header">' +
-        (!fromMe ? '<span class="role-badge role-' + m.sender_role + '" style="font-size:10px;padding:1px 5px">' + esc(m.sender_name) + '</span>' : '<span style="font-size:11px;color:var(--text-muted)">Voce</span>') +
-        '<span style="font-size:11px;color:var(--text-muted)">' + new Date(m.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) + '</span>' +
-      '</div>' +
-      '<div class="chat-bubble">' + esc(m.message) + '</div>' +
-    '</div>';
+    var fromMe = String(m.sender_id) === String(CURRENT_USER.id);
+    var replyHtml = '';
+    if (m.reply_to_id) {
+      replyHtml =
+        '<div class="reply-quote" onclick="scrollToMsg(' + m.reply_to_id + ')">' +
+          '<div class="rq-name">' + esc(m.reply_to_name || '?') + '</div>' +
+          '<div class="rq-text">' + esc((m.reply_to_text || '').substring(0,80)) + '</div>' +
+        '</div>';
+    }
+    var replyBtn = '<button class="reply-btn" data-mid="' + m.id + '" data-mname="' + esc(m.sender_name) + '" onclick="setReplyFromBtn(this)">↩ Responder</button>';
+    html +=
+      '<div class="chat-msg ' + (fromMe ? 'from-me' : 'from-other') + '" id="gmsg-' + m.id + '">' +
+        replyBtn +
+        '<div class="chat-msg-header">' +
+          (!fromMe
+            ? '<span class="role-badge role-' + m.sender_role + '" style="font-size:10px;padding:1px 5px">' + esc(m.sender_name) + '</span>'
+            : '<span style="font-size:11px;color:var(--text-muted)">Voce</span>') +
+          '<span style="font-size:11px;color:var(--text-muted)">' +
+            new Date(m.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) +
+          '</span>' +
+        '</div>' +
+        replyHtml +
+        '<div class="chat-bubble">' + esc(m.message) + '</div>' +
+      '</div>';
   });
-  var isNew = messages[messages.length-1] && messages[messages.length-1].id > LAST_GROUP_MSG_ID;
-  LAST_GROUP_MSG_ID = messages[messages.length-1] ? messages[messages.length-1].id : LAST_GROUP_MSG_ID;
+  var last = messages[messages.length-1];
+  var isNew = last && last.id > LAST_GROUP_MSG_ID;
+  LAST_GROUP_MSG_ID = last ? last.id : LAST_GROUP_MSG_ID;
   box.innerHTML = html;
   if (atBottom || isNew) box.scrollTop = box.scrollHeight;
 }
+
+function scrollToMsg(id) {
+  var el = document.getElementById('gmsg-' + id);
+  if (el) { el.scrollIntoView({ behavior:'smooth', block:'center' }); el.style.outline='1px solid var(--blue-glow)'; setTimeout(function(){ el.style.outline=''; }, 1500); }
+}
+
+function setReplyFromBtn(btn) {
+  var msgId = btn.getAttribute('data-mid');
+  var senderName = btn.getAttribute('data-mname');
+  setReply(msgId, senderName);
+}
+
+function setReply(msgId, senderName, btn) {
+  // Get message text from the bubble
+  var msgEl = document.getElementById('gmsg-' + msgId);
+  var bubbleEl = msgEl ? msgEl.querySelector('.chat-bubble') : null;
+  var text = bubbleEl ? bubbleEl.textContent : '';
+  REPLY_TO = { id: msgId, name: senderName, text: text };
+  var prev = document.getElementById('reply-preview');
+  var prevName = document.getElementById('reply-preview-name');
+  var prevText = document.getElementById('reply-preview-text');
+  if (prev) prev.style.display = '';
+  if (prevName) prevName.textContent = 'Respondendo a ' + senderName;
+  if (prevText) prevText.textContent = text.substring(0, 80);
+  var inp = document.getElementById('groupchat-input');
+  if (inp) inp.focus();
+}
+
+function cancelReply() {
+  REPLY_TO = null;
+  var prev = document.getElementById('reply-preview');
+  if (prev) prev.style.display = 'none';
+}
+
+// Slash command autocomplete
+function onGroupInput(inp) {
+  var val = inp.value;
+  var menu = document.getElementById('slash-menu');
+  var todayEl = document.getElementById('slash-today');
+  if (!menu) return;
+  if (val === '/' || val.startsWith('/c') || val.startsWith('/cl')) {
+    var rect = inp.getBoundingClientRect();
+    menu.style.display = '';
+    menu.style.left = rect.left + 'px';
+    menu.style.top = (rect.top - menu.offsetHeight - 6) + 'px';
+    if (todayEl) todayEl.textContent = today();
+  } else {
+    menu.style.display = 'none';
+  }
+}
+
+function applySlash(cmd) {
+  var inp = document.getElementById('groupchat-input');
+  if (inp) inp.value = cmd;
+  var menu = document.getElementById('slash-menu');
+  if (menu) menu.style.display = 'none';
+  inp.focus();
+}
+
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('slash-menu');
+  if (menu && !menu.contains(e.target) && e.target.id !== 'groupchat-input') {
+    menu.style.display = 'none';
+  }
+});
 
 async function sendGroupMsg() {
   var inp = document.getElementById('groupchat-input');
   var msg = inp ? inp.value.trim() : '';
   if (!msg) return;
+
+  // Handle slash commands
+  if (msg.startsWith('/clear ') || msg === '/clear') {
+    if (!hasRole('moderador')) { toast('Apenas Moderador+ pode usar /clear', 'warning'); inp.value=''; return; }
+    var arg = msg.replace('/clear', '').trim();
+    if (!arg) { toast('Use: /clear all | /clear N | /clear DD/MM/AAAA', 'info'); return; }
+    inp.value = '';
+    document.getElementById('slash-menu').style.display = 'none';
+    try {
+      var d = await api('/api/groupchat', 'POST', { clear: arg });
+      toast(d.deleted + ' mensagem(ns) apagada(s)', 'success');
+      await loadGroupChat();
+    } catch(e) { toast(e.message, 'error'); }
+    return;
+  }
+
   inp.value = '';
+  document.getElementById('slash-menu').style.display = 'none';
+  var payload = { message: msg };
+  if (REPLY_TO) {
+    payload.reply_to_id   = REPLY_TO.id;
+    payload.reply_to_name = REPLY_TO.name;
+    payload.reply_to_text = REPLY_TO.text;
+    cancelReply();
+  }
   try {
-    await api('/api/groupchat', 'POST', { message: msg });
+    await api('/api/groupchat', 'POST', payload);
     await loadGroupChat();
   } catch(e) { toast(e.message, 'error'); }
 }

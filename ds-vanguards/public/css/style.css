@@ -756,3 +756,60 @@ select.form-control option { background: var(--bg-card); }
 .presence-tag.online  { background: rgba(0,229,160,0.1); color: var(--success); border: 1px solid rgba(0,229,160,0.3); }
 .presence-tag.offline { background: var(--bg-secondary); color: var(--text-muted); border: 1px solid var(--blue-dim); }
 .presence-tag.me      { background: rgba(0,170,255,0.1); color: var(--blue-glow); border: 1px solid rgba(0,170,255,0.3); }
+
+/* ── Reply bubble inside message ── */
+.reply-quote {
+  background: rgba(0,0,0,0.25);
+  border-left: 3px solid var(--blue-glow);
+  border-radius: 4px;
+  padding: 4px 10px;
+  margin-bottom: 5px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.reply-quote .rq-name { color: var(--blue-glow); font-weight: 600; margin-bottom: 2px; }
+.reply-quote .rq-text { color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.from-me .reply-quote { border-left-color: rgba(255,255,255,0.4); }
+.from-me .reply-quote .rq-name { color: rgba(255,255,255,0.7); }
+
+/* ── Reply button on hover ── */
+.chat-msg { position: relative; }
+.chat-msg:hover .reply-btn { opacity: 1; }
+.reply-btn {
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-card);
+  border: 1px solid var(--blue-border);
+  border-radius: 4px;
+  padding: 3px 7px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.from-me  .reply-btn { left: -70px; }
+.from-other .reply-btn { right: -70px; }
+.reply-btn:hover { color: var(--blue-glow); border-color: var(--blue-glow); }
+
+/* ── Slash command menu ── */
+.slash-cmd {
+  padding: 7px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.15s;
+}
+.slash-cmd:hover { background: var(--blue-dim); }
+
+/* ── System message (clear notice) ── */
+.chat-sys-msg {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 4px 0;
+  font-style: italic;
+}
