@@ -180,27 +180,51 @@
 
       <!-- USERS -->
       <div id="page-users" style="display:none">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">👥 <span class="title-accent">Usuários</span></div>
-            <span id="users-perms-label" style="font-size:12px;color:var(--text-muted)"></span>
+        <div id="users-no-access" style="display:none">
+          <div class="card">
+            <div class="card-header"><div class="card-title">👥 <span class="title-accent">Usuários</span></div></div>
+            <div class="empty-state">
+              <div class="empty-icon">🔒</div>
+              <div class="empty-text" style="margin-bottom:8px">Sem acesso.</div>
+              <p style="font-size:12px;color:var(--text-muted)">Esta área é restrita a <strong style="color:var(--warning)">Moderador</strong> ou superior.</p>
+            </div>
           </div>
-          <div id="users-container"><div class="empty-state"><div class="spinner"></div></div></div>
+        </div>
+        <div id="users-main" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">👥 <span class="title-accent">Usuários</span></div>
+              <span id="users-perms-label" style="font-size:12px;color:var(--text-muted)"></span>
+            </div>
+            <div id="users-container"><div class="empty-state"><div class="spinner"></div></div></div>
+          </div>
         </div>
       </div>
 
       <!-- LOGS -->
       <div id="page-logs" style="display:none">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">📋 <span class="title-accent">Logs de Atividade</span></div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;box-shadow:0 0 6px var(--success)"></span>
-              <span style="font-size:11px;color:var(--text-muted)">Tempo real (10s)</span>
-              <button class="btn btn-secondary btn-sm" onclick="loadLogs()">↺</button>
+        <div id="logs-no-access" style="display:none">
+          <div class="card">
+            <div class="card-header"><div class="card-title">📋 <span class="title-accent">Logs de Atividade</span></div></div>
+            <div class="empty-state">
+              <div class="empty-icon">🔒</div>
+              <div class="empty-text" style="margin-bottom:8px">Sem acesso.</div>
+              <p style="font-size:12px;color:var(--text-muted)">Esta área é restrita a <strong style="color:var(--warning)">Moderador</strong> ou superior.</p>
             </div>
           </div>
-          <div id="logs-container"><div class="empty-state"><div class="spinner"></div></div></div>
+        </div>
+        <div id="logs-main" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📋 <span class="title-accent">Logs de Atividade</span></div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;box-shadow:0 0 6px var(--success)"></span>
+                <span style="font-size:11px;color:var(--text-muted)">Tempo real (10s)</span>
+                <button class="btn btn-secondary btn-sm" onclick="loadLogs()">↺</button>
+              </div>
+            </div>
+            <div id="logs-container"><div class="empty-state"><div class="spinner"></div></div></div>
+          </div>
         </div>
       </div>
 

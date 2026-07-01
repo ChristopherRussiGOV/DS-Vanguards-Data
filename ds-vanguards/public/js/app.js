@@ -209,6 +209,14 @@ function presenceTag(userId) {
 // USERS
 async function loadUsers() {
   var isAdmin = hasRole('admin');
+  // Show lock screen for non-moderador
+  if (!hasRole('moderador')) {
+    document.getElementById('users-no-access').style.display='';
+    document.getElementById('users-main').style.display='none';
+    return;
+  }
+  document.getElementById('users-no-access').style.display='none';
+  document.getElementById('users-main').style.display='';
   document.getElementById('users-perms-label').textContent = isAdmin ? 'Admin - edicao completa' : 'Moderador - somente visualizacao';
   var c = document.getElementById('users-container');
   c.innerHTML = '<div class="empty-state"><div class="spinner"></div></div>';
@@ -269,6 +277,13 @@ function confirmDeleteUser(id, username) {
 // LOGS
 var LAST_LOG_ID = 0;
 async function loadLogs() {
+  if (!hasRole('moderador')) {
+    document.getElementById('logs-no-access').style.display='';
+    document.getElementById('logs-main').style.display='none';
+    return;
+  }
+  document.getElementById('logs-no-access').style.display='none';
+  document.getElementById('logs-main').style.display='';
   var c = document.getElementById('logs-container');
   try {
     var d = await api('/api/logs?limit=100');
@@ -948,12 +963,14 @@ function renderGuestMessages(messages) {
   messages.forEach(function(m) {
     var isAdm   = m.sender_role === 'admin' || m.sender_role === 'moderador';
     var isGuest = m.sender_role === 'guest';
-    // Admin messages appear on RIGHT (from-me style) with pink badge
-    // User/guest messages appear on LEFT (from-other style) with name label
-    var cls = isAdm ? 'from-me' : 'from-other';
+    // Guest/user messages = RIGHT (they sent them = "from-me")
+    // Admin/mod messages  = LEFT  (received from admin = "from-other")
+    var cls = isAdm ? 'from-other is-admin' : 'from-me';
     var nameHtml = '';
     if (isAdm) {
-      nameHtml = '<span class="role-badge role-admin" style="font-size:10px;padding:1px 5px">' + esc(m.sender_name) + '</span>';
+      // Use correct role badge color - moderador gets warning, admin gets admin color
+      var adminRole = m.sender_role === 'moderador' ? 'moderador' : 'admin';
+      nameHtml = '<span class="role-badge role-' + adminRole + '" style="font-size:10px;padding:1px 5px">' + esc(m.sender_name) + '</span>';
     } else if (isGuest) {
       nameHtml = '<span style="font-size:10px;color:#9b59b6;font-weight:700;background:rgba(155,89,182,0.15);padding:1px 6px;border-radius:3px;border:1px solid rgba(155,89,182,0.4)">Sem_login</span>';
     } else {
